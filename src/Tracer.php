@@ -62,9 +62,12 @@ class Tracer
         self::$reportSpans = array_merge(self::$reportSpans, func_get_args());
     }
 
-    public static function log($log)
+    public static function log($key, $value = null)
     {
-        self::$logs[] = $log;
+        if (func_num_args() > 1) {
+            self::$logs[$key] = $value;
+        }
+        self::$logs[] = $key;
     }
 
     /**
@@ -78,11 +81,11 @@ class Tracer
         foreach (self::$reportSpans as &$span) {
             $span = $span->getToReport();
         }
+        $associate = self::span()
+            ? array('traceId' => self::span()->traceId, 'spanId' => self::span()->id,)
+            : array();
         $logs = self::$logs
-            ? array(
-                'traceId' => self::span()->traceId,
-                'spanId' => self::span()->id,
-                self::$logs)
+            ? array_merge($associate, self::$logs)
             : null;
         Collector::collect(self::$reportSpans, $logs);
     }
