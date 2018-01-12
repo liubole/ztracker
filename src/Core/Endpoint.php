@@ -110,7 +110,7 @@ class Endpoint
         return JsonCodec::write($this);
     }
 
-    public function toArray()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }

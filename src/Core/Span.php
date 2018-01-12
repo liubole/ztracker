@@ -430,4 +430,30 @@ class Span
         }
         return array_unique($result);
     }
+
+    public function getToReport()
+    {
+        $array = array();
+        if (!isset($this->duration)) {
+            $this->duration = Util::duration($this->timestamp, Util::current());
+        }
+        foreach (get_object_vars($this) as $key => $val) {
+            if ($val instanceof Decision) {
+                $array[$key] = $val->decision;
+            } else if ($val instanceof Endpoint) {
+                $array[$key] = $val->convertToArray();
+            } else if (is_array($val) && count($val) > 0) {
+                foreach ($val as $k => $v) {
+                    if ($v instanceof Annotation) {
+                        $array[$key][$k] = $v->convertToArray();
+                    } else {
+                        $array[$key][$k] = $v;
+                    }
+                }
+            } else {
+                $array[$key] = $val;
+            }
+        }
+        return $array;
+    }
 }

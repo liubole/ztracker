@@ -67,21 +67,7 @@ class Tracer
     {
         if (!self::$reportSpans) {return;}
         foreach (self::$reportSpans as &$span) {
-            if (!isset($span->duration)) {
-                $span->duration = Util::duration($span->timestamp, Util::current());
-            }
-            if ($span->decision) {
-                $span->decision = $span->decision->toArray();
-            }
-            if ($span->localEndpoint) {
-                $span->localEndpoint = $span->localEndpoint->toArray();
-            }
-            if ($span->remoteEndpoint) {
-                $span->remoteEndpoint = $span->remoteEndpoint->toArray();
-            }
-            foreach ($span->annotations as &$annotation) {
-                $annotation = $annotation->toArray();
-            }
+            $span = $span->getToReport();
         }
         // 记录span
         // todo

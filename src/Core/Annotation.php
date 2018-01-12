@@ -84,9 +84,8 @@ class Annotation
         return substr_compare($this->value, $that->value, 0);
     }
 
-    public function toArray()
+    public function convertToArray()
     {
-        $arr =  get_object_vars($this);
-        return $arr;
+        return get_object_vars($this);
     }
 }
