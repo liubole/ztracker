@@ -32,7 +32,7 @@ function clientInit()
     Tracer::span(
         $currentSpan = GlobalTracer::spanBuilder()
             ->traceId(Util::uuid())
-            ->id(Util::initSpanId())
+            ->id(Util::spanId())
             ->name(Server::getServerApi())
             ->localEndpoint($localEndpoint)
             ->decision(GlobalTracer::decisionBuilder($sampleRate))

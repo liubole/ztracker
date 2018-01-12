@@ -134,7 +134,7 @@ class Span
         $this->traceId($span->traceId)
             ->parentId($span->id)
             ->decision($span->decision)
-            ->id(Util::childSpanId($span->id));
+            ->id(Util::spanId());
         return $this;
     }
 
