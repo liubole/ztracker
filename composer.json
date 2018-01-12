@@ -1,5 +1,5 @@
 {
-  "name": "tricolor/tracker",
+  "name": "tricolor/ztracker",
   "description": "openzipkin in php(client)",
   "keywords": [
     "track",
