@@ -69,8 +69,8 @@ class RabbitMQ
     private static function declareQueue(&$channel)
     {
         $prop = array(
-            'x-max-length' => self::$queue_max_length,
-            'x-overflow' => 'reject-publish'
+            'x-max-length' => array('I', self::$queue_max_length),
+            'x-overflow' => array('S', 'reject-publish'),
         );
         $channel->queue_declare(self::queue(), false, false, false, false, false, $prop);
         $channel->queue_bind(self::queue(), self::exchange(), self::key());
