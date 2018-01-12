@@ -21,7 +21,8 @@ class Util
 
     public static function duration($start, $end)
     {
-        return bcsub(substr($end, 11) . substr($end, 1, 9), substr($start, 11) . substr($start, 1, 9), 8);
+//        return bcsub(substr($end, 11) . substr($end, 1, 9), substr($start, 11) . substr($start, 1, 9), 8);
+        return bcsub($end, $start, 8);
     }
 
     public static function uuid()
