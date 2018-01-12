@@ -6,7 +6,7 @@
  */
 namespace Tricolor\ZTracker;
 
-use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Core\Collector;
 use Tricolor\ZTracker\Core\Context;
 use Tricolor\ZTracker\Core\Endpoint;
 use Tricolor\ZTracker\Core\Span;
@@ -17,6 +17,7 @@ class Tracer
     private static $localEndpoint;
     private static $context;
     private static $reportSpans;
+    private static $logs;
 
     /**
      * @param Span|null $span
@@ -61,7 +62,13 @@ class Tracer
         self::$reportSpans = array_merge(self::$reportSpans, func_get_args());
     }
 
+    public static function log($log)
+    {
+        self::$logs[] = $log;
+    }
+
     /**
+     *
      */
     public static function flush()
     {
@@ -69,8 +76,6 @@ class Tracer
         foreach (self::$reportSpans as &$span) {
             $span = $span->getToReport();
         }
-        // 记录span
-        // todo
-        var_dump(self::$reportSpans);
+        Collector::collect(self::$reportSpans, self::$logs);
     }
 }
