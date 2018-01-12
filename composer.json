@@ -1,0 +1,40 @@
+{
+  "name": "tricolor/tracker",
+  "description": "openzipkin in php(client)",
+  "keywords": [
+    "track",
+    "debug"
+  ],
+  "time": "2017-12-10",
+  "license": "MIT License",
+  "authors": [
+    {
+      "name": "liubole",
+      "email": "bole.java@gmail.com",
+      "homepage": "https://liubole.github.io",
+      "role": "Engineer"
+    }
+  ],
+  "require": {
+    "php": ">=5.3",
+    "php-amqplib/php-amqplib": "v2.5.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.0.0",
+    "php-amqplib/php-amqplib": "2.5.*"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
+    },
+    {
+      "packagist": false
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Tricolor\\ZTracker\\": "src/"
+    }
+  }
+}
