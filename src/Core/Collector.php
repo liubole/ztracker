@@ -15,7 +15,7 @@ class Collector
      * @param $spans array
      * @param $logs array
      */
-    public static function collect($spans, $logs)
+    public static function collect(&$spans, &$logs)
     {
         self::reportSpans($spans);
         self::logLogs($logs);
