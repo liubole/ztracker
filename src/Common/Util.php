@@ -87,7 +87,8 @@ class Util
     public static function arrayEqual($arr1, $arr2)
     {
         if (!is_array($arr1) || !is_array($arr2)) return false;
-        return empty(array_diff($arr1, $arr2));
+        $diff = array_diff($arr1, $arr2);
+        return empty($diff);
     }
 
     public static function writeHexLong()

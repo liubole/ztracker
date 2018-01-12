@@ -8,7 +8,6 @@ namespace Tricolor\ZTracker\Core;
 
 use Tricolor\ZTracker\Common\JsonCodec;
 use Tricolor\ZTracker\Common\Util;
-use Tricolor\ZTracker\Core\Enum\SpanKind;
 use Tricolor\ZTracker\Exception\NullPointerException;
 
 class Span
@@ -381,7 +380,8 @@ class Span
             $this->annotations = array();
         }
         $timestamp = $timestamp ? $timestamp : Util::current();
-        $annotation = (Annotation::builder())->timestamp($timestamp)->value((string)$value);
+        $annotation = Annotation::builder();
+        $annotation = $annotation->timestamp($timestamp)->value((string)$value);
         array_push($this->annotations, $annotation);
         return $this;
     }

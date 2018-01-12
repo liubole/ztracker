@@ -6,7 +6,7 @@
  */
 namespace Tricolor\ZTracker\Core\Enum;
 
-class SpanKind extends \SplEnum
+class SpanKind
 {
     const CLIENT = '0';
     const SERVER = '1';

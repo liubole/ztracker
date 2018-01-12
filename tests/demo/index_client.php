@@ -92,17 +92,16 @@ function clientRpc()
 {
     $headers = array();
     $span = GlobalTracer::spanBuilder()
-        ->childOf(Tracer::span())//no need to call traceId() & id() & parentId()
+        ->childOf(Tracer::span())
         ->name('mysql.api')
         ->shared(true)
-        ->localEndpoint(Tracer::localEndpoint());
-
-    $span->addAnnotation('cs', $cs = Util::current());
-    GlobalTracer::newCarrier(CarrierType\HttpHeader)//返回 carrier
-        ->pipe($headers)//返回 carrier
+        ->localEndpoint(Tracer::localEndpoint())
+        ->addAnnotation('cs', $cs = Util::current());
+    GlobalTracer::newCarrier(CarrierType\HttpHeader)
+        ->pipe($headers)
         ->span($span)
         ->context(Tracer::context())
-        ->inject();//返回 carrier
+        ->inject();
     // do rpc
     {}
     // end rpc
