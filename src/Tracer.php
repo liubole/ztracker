@@ -72,10 +72,17 @@ class Tracer
      */
     public static function flush()
     {
-        if (!self::$reportSpans) {return;}
+        if (!self::$reportSpans) {
+            return;
+        }
         foreach (self::$reportSpans as &$span) {
             $span = $span->getToReport();
         }
-        Collector::collect(self::$reportSpans, self::$logs);
+        $logs = array(
+            'traceId' => self::span()->traceId,
+            'spanId' => self::span()->id,
+            self::$logs
+        );
+        Collector::collect(self::$reportSpans, $logs);
     }
 }
