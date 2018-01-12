@@ -13,6 +13,7 @@ use Tricolor\ZTracker\Config;
 class RabbitMQ
 {
     private static $conn;
+    private static $queue_max_length = 10000;
 
     /**
      */
@@ -35,10 +36,9 @@ class RabbitMQ
         try {
             self::connect();
             $channel = self::getChannel(self::$conn, self::exchange());
-            if (self::$conn && $channel) {
-                $msgObj = new AMQPMessage($message);
-                $channel->basic_publish($msgObj, self::exchange(), self::key());
-            }
+            self::declareQueue($channel);
+            $msgObj = new AMQPMessage($message);
+            $channel->basic_publish($msgObj, self::exchange(), self::key());
         } catch (\Exception $e) {
             throw $e;
         }
@@ -53,8 +53,7 @@ class RabbitMQ
         try {
             self::connect();
             $channel = self::getChannel(self::$conn, self::exchange());
-            $channel->queue_declare(self::queue(), false, false, false, false);
-            $channel->queue_bind(self::queue(), self::exchange(), self::key());
+            self::declareQueue($channel);
             $channel->basic_consume(self::queue(), '', false, true, false, false, $callback);
             while (count($channel->callbacks)) {
                 $channel->wait();
@@ -62,6 +61,19 @@ class RabbitMQ
         } catch (\Exception $e) {
             throw $e;
         }
+    }
+
+    /**
+     * @param $channel AMQPChannel
+     */
+    private static function declareQueue(&$channel)
+    {
+        $prop = array(
+            'x-max-length' => self::$queue_max_length,
+            'x-overflow' => 'reject-publish'
+        );
+        $channel->queue_declare(self::queue(), false, false, false, false, false, $prop);
+        $channel->queue_bind(self::queue(), self::exchange(), self::key());
     }
 
     /**
