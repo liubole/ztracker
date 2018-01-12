@@ -80,4 +80,9 @@ class Decision
         }
         return true;
     }
+
+    public function toArray()
+    {
+        return $this->decision;
+    }
 }

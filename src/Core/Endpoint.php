@@ -109,4 +109,9 @@ class Endpoint
     {
         return JsonCodec::write($this);
     }
+
+    public function toArray()
+    {
+        return get_object_vars($this);
+    }
 }

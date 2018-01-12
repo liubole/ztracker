@@ -70,6 +70,18 @@ class Tracer
             if (!isset($span->duration)) {
                 $span->duration = Util::duration($span->timestamp, Util::current());
             }
+            if ($span->decision) {
+                $span->decision = $span->decision->toArray();
+            }
+            if ($span->localEndpoint) {
+                $span->localEndpoint = $span->localEndpoint->toArray();
+            }
+            if ($span->remoteEndpoint) {
+                $span->remoteEndpoint = $span->remoteEndpoint->toArray();
+            }
+            foreach ($span->annotations as &$annotation) {
+                $annotation = $annotation->toArray();
+            }
         }
         // 记录span
         // todo

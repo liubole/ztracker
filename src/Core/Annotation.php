@@ -83,4 +83,10 @@ class Annotation
         if ($byTimestamp != 0) return $byTimestamp;
         return substr_compare($this->value, $that->value, 0);
     }
+
+    public function toArray()
+    {
+        $arr =  get_object_vars($this);
+        return $arr;
+    }
 }
