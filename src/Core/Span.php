@@ -380,7 +380,7 @@ class Span
             $this->annotations = array();
         }
         $timestamp = $timestamp ? $timestamp : Util::current();
-        $annotation = Annotation::builder();
+        $annotation = new Annotation();
         $annotation = $annotation->timestamp($timestamp)->value((string)$value);
         array_push($this->annotations, $annotation);
         return $this;

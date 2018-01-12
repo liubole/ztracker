@@ -8,7 +8,6 @@ namespace Tricolor\ZTracker\Core;
 
 use Tricolor\ZTracker\Common\JsonCodec;
 use Tricolor\ZTracker\Common\Util;
-use Tricolor\ZTracker\Core\Builder\EndpointBuilder;
 
 class Endpoint
 {
@@ -59,34 +58,103 @@ class Endpoint
      */
     public $port;
 
-    public function __construct($serviceName, $ipv4, $ipv6, $port)
+    public function __construct()
     {
-        $this->serviceName = empty(Util::checkNotNull($serviceName, "serviceName"))
-            ? ""
-            : strtolower($serviceName);
-        $this->ipv4 = $ipv4;
-        $this->ipv6 = $ipv6;
-        $this->port = $port;
     }
 
     /**
      * @param $serviceName string
      * @param $ipv4 int
+     * @param $ipv6 string
+     * @param $port int
      * @return Endpoint
      */
-    public static function create($serviceName, $ipv4)
+    public static function create($serviceName, $ipv4, $ipv6, $port)
     {
-        return new Endpoint($serviceName, $ipv4, null, null);
+        $endpoint = new Endpoint();
+        $endpoint->serviceName =
+            empty(Util::checkNotNull($serviceName, "serviceName"))
+            ? ""
+            : strtolower($serviceName);
+        $endpoint->ipv4 = $ipv4;
+        $endpoint->ipv6 = $ipv6;
+        $endpoint->port = $port;
+        return $endpoint;
     }
 
-    public function toBuilder()
+    /**
+     * @see Endpoint#serviceName
+     * @param $serviceName String
+     * @return $this
+     */
+    public function serviceName($serviceName)
     {
-        return new EndpointBuilder($this);
+        $this->serviceName = $serviceName;
+        return $this;
+    }
+    /**
+     * Chaining variant of {@link #parseIp(InetAddress)}
+     * @param $addr
+     * @return $this
+     */
+    public function ip($addr)
+    {
+        $this->parseIp($addr);
+        return $this;
     }
 
-    public static function builder()
+    public function parseIp($ip)
     {
-        return new EndpointBuilder();
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
+            $this->ipv6($ip);
+        } else {
+            $this->ipv4($ip);
+        }
+    }
+
+    /** @see Endpoint#ipv4 */
+    public function ipv4($ipv4)
+    {
+        $this->ipv4 = $ipv4;
+        return $this;
+    }
+
+    /**
+     * When not null, this sets the {@link Endpoint#ipv6}, unless the input is an <a
+     * href="https://tools.ietf.org/html/rfc4291#section-2.5.5.2">IPv4-Compatible or IPv4-Mapped
+     * Embedded IPv6 Address</a>. In such case, {@link #ipv4(int)} is called with the embedded
+     * address.
+     *
+     * @see Endpoint#ipv6
+     * @param $ipv6 => byte[]
+     * @return $this
+     */
+    public function ipv6($ipv6)
+    {
+        if (empty($ipv6)) {
+            $this->ipv6 = null;
+            return $this;
+        }
+        Util::checkArgument(strlen($ipv6) == 16, "ipv6 addresses are 16 bytes: " . strlen($ipv6));
+        $this->ipv6 = $ipv6;
+        return $this;
+    }
+
+    /**
+     * Use this to set the port to an externally defined value.
+     *
+     * <p>Don't pass {@link Endpoint#port} to this method, as it may result in a
+     * NullPointerException. Instead, use {@link Endpoint#toBuilder()} or {@link #port(Short)}.
+     *
+     * @see Endpoint#port
+     * @param $port int  associated with the endpoint. zero coerces to null (unknown)
+     * @return $this
+     */
+    public function port($port)
+    {
+        Util::checkArgument($port <= 0xffff, "invalid port %s", $port);
+        $this->port = $port <= 0 ? null : ($port & 0xffff);
+        return $this;
     }
 
     public function equals($o)

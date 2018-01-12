@@ -8,7 +8,6 @@ namespace Tricolor\ZTracker;
 use Tricolor\ZTracker\Carrier\HttpHeaders;
 use Tricolor\ZTracker\Carrier\RabbitMQHeaders;
 use Tricolor\ZTracker\Common\Util;
-use Tricolor\ZTracker\Core\Builder\EndpointBuilder;
 use Tricolor\ZTracker\Core\Context;
 use Tricolor\ZTracker\Core\Decision;
 use Tricolor\ZTracker\Core\Endpoint;
@@ -18,12 +17,11 @@ class GlobalTracer
 {
 
     /**
-     * @param $context
-     * @return Core\Builder\ContextBuilder
+     * @return Core\Context
      */
-    public static function contextBuilder(Context $context = null)
+    public static function contextBuilder()
     {
-        return Context::builder($context);
+        return new Context();
     }
 
     /**
@@ -59,11 +57,11 @@ class GlobalTracer
     }
 
     /**
-     * @return EndpointBuilder
+     * @return Endpoint
      */
     public static function endpointBuilder()
     {
-        return Endpoint::builder();
+        return new Endpoint();
     }
 
 }

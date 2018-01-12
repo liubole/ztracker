@@ -6,8 +6,6 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Core\Builder\ContextBuilder;
-
 class Context
 {
     public function __construct($vars = null)
@@ -44,23 +42,6 @@ class Context
     public static function create($vars)
     {
         return new Context($vars);
-    }
-
-    /**
-     * @return ContextBuilder
-     */
-    public function toBuilder()
-    {
-        return new ContextBuilder($this);
-    }
-
-    /**
-     * @param $context
-     * @return ContextBuilder
-     */
-    public static function builder(Context $context = null)
-    {
-        return new ContextBuilder($context);
     }
 
 }

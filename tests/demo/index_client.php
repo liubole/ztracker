@@ -28,7 +28,6 @@ function clientInit()
             ->serviceName(Server::getServerApi())
             ->ip(Server::getServerIp())
             ->port(Server::getServerPort())
-            ->build()
     );
     Tracer::span(
         $currentSpan = GlobalTracer::spanBuilder()
@@ -41,7 +40,7 @@ function clientInit()
             ->addAnnotation('cr', $timestamp)
     );
     Tracer::context(
-        $context = GlobalTracer::contextBuilder()->build()
+        $context = GlobalTracer::contextBuilder()
     );
 }
 
@@ -77,8 +76,7 @@ function clientMysql()
             $remoteEndpoint = GlobalTracer::endpointBuilder()
                 ->serviceName('mysql')
                 ->ip('127.0.0.1')
-                ->port('1234')
-                ->build());
+                ->port('1234'));
     $span->addAnnotation('cs', $cs = Util::current());
     //do query
     {}
@@ -126,7 +124,6 @@ function apiInit()
             ->serviceName(Server::getServerApi())
             ->ip(Server::getServerIp())
             ->port(Server::getServerPort())
-            ->build()
     );
     //创建span
     Tracer::span(

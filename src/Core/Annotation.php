@@ -7,7 +7,6 @@
 namespace Tricolor\ZTracker\Core;
 
 use Tricolor\ZTracker\Common\Util;
-use Tricolor\ZTracker\Core\Builder\AnnotationBuilder;
 
 class Annotation
 {
@@ -33,11 +32,8 @@ class Annotation
      */
     public $endpoint;
 
-    public function __construct($timestamp, $value, Endpoint $endpoint)
+    public function __construct()
     {
-        $this->timestamp = $timestamp;
-        $this->value = Util::checkNotNull($value, "value");
-        $this->endpoint = $endpoint;
     }
 
     public static function create($timestamp, $value, Endpoint $endpoint)
@@ -45,14 +41,37 @@ class Annotation
         return new Annotation($timestamp, $value, $endpoint);
     }
 
-    public function toBuilder()
+    /**
+     * @see Annotation#timestamp
+     * @param $timestamp
+     * @return $this
+     */
+    public function timestamp($timestamp)
     {
-        return new AnnotationBuilder($this);
+        $this->timestamp = $timestamp;
+        return $this;
     }
 
-    public static function builder()
+    /**
+     * @see Annotation#value
+     * @param $value
+     * @return $this
+     */
+    public function value($value)
     {
-        return new AnnotationBuilder();
+        $this->value = $value;
+        return $this;
+    }
+
+    /**
+     * @see Annotation#endpoint
+     * @param Endpoint $endpoint
+     * @return $this
+     */
+    public function endpoint(Endpoint $endpoint)
+    {
+        $this->endpoint = $endpoint;
+        return $this;
     }
 
     public function equals($o)
