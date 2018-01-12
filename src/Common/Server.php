@@ -16,13 +16,23 @@ class Server
         return '';
     }
 
+    public static function getServerApiByUrl($url)
+    {
+        $url = strpos($url, 'http') === 0 ? substr($url, strpos($url, '/') + 2) : $url;
+        $url = strpos($url, '#') !== false ? substr($url, 0, strpos($url, '#')) : $url;
+        if (($idx = strpos($url, '?')) !== false) {
+            return substr($url, 0, $idx);
+        }
+        return $url;
+    }
+
     public static function getServerApi()
     {
         if (!isset($_SERVER) || !isset($_SERVER['REQUEST_URI'])) return '';
         if (($idx = strpos($_SERVER['REQUEST_URI'], '?')) !== false) {
-            return substr($_SERVER['REQUEST_URI'], 0, $idx);
+            return $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, $idx);
         }
-        return $_SERVER['REQUEST_URI'];
+        return $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
 
     public static function getServerIp()
