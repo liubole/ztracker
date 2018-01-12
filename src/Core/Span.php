@@ -17,10 +17,6 @@ class Span
      */
     public $traceId;
     /**
-     * Long
-     */
-    public $traceIdHigh;
-    /**
      * String
      */
     public $name;
@@ -77,17 +73,6 @@ class Span
 
     public function __construct()
     {
-//        $this->traceId = Util::checkNotNull($builder->traceId, "traceId");
-//        $this->traceIdHigh = $builder->traceIdHigh != null ? $builder->traceIdHigh : 0;
-//        $this->name = empty(Util::checkNotNull($builder->name, "name")) ? ""
-//            : strtolower($builder->name);
-//        $this->id = Util::checkNotNull($builder->id, "id");
-//        $this->parentId = $builder->parentId;
-//        $this->timestamp = $builder->timestamp;
-//        $this->duration = $builder->duration;
-//        $this->decision = $builder->decision;
-//        $this->annotations = Util::sortedList($builder->annotations);
-//        $this->debug = $builder->debug;
     }
 
     public function clear()

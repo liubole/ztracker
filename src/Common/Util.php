@@ -15,7 +15,8 @@ class Util
 
     public static function current()
     {
-        return microtime();
+        $str = microtime();
+        return substr($str, 11) . substr($str, 1, 9);
     }
 
     public static function duration($start, $end)
