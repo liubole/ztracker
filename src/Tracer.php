@@ -66,8 +66,9 @@ class Tracer
     {
         if (func_num_args() > 1) {
             self::$logs[$key] = $value;
+        } else {
+            self::$logs[] = $key;
         }
-        self::$logs[] = $key;
     }
 
     /**
