@@ -78,11 +78,12 @@ class Tracer
         foreach (self::$reportSpans as &$span) {
             $span = $span->getToReport();
         }
-        $logs = array(
-            'traceId' => self::span()->traceId,
-            'spanId' => self::span()->id,
-            self::$logs
-        );
+        $logs = self::$logs
+            ? array(
+                'traceId' => self::span()->traceId,
+                'spanId' => self::span()->id,
+                self::$logs)
+            : null;
         Collector::collect(self::$reportSpans, $logs);
     }
 }

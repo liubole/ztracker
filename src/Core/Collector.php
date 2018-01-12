@@ -70,7 +70,7 @@ class Collector
      */
     private static function reportSpanToFile(&$spans)
     {
-        if (Collector\Span\FileLog::ready()) {
+        if ($spans && Collector\Span\FileLog::ready()) {
             $message = self::encode($spans, Config\Collector::$reportType);
             return Collector\Span\FileLog::write($message);
         }
@@ -84,7 +84,7 @@ class Collector
      */
     private static function logLogs(&$logs)
     {
-        if (Collector\Log\FileLog::ready()) {
+        if ($logs && Collector\Log\FileLog::ready()) {
             $message = self::encode($logs, Config\Collector::$logType);
             return Collector\Log\FileLog::write($message);
         }
