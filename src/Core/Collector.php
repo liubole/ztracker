@@ -29,19 +29,14 @@ class Collector
     private static function reportSpans(&$spans)
     {
         try {
-            switch (Config\Collector::$reporter)
-            {
+            switch (Config\Collector::$reporter) {
                 case Config\Collector::reporterRabbitMQ:
-                    $res = self::reportSpanByRabbitMQ($spans);
-                    break;
+                    return self::reportSpanByRabbitMQ($spans);
                 case Config\Collector::reporterFile:
-                    $res = self::reportSpanToFile($spans);
-                    break;
+                    return self::reportSpanToFile($spans);
                 default:
-                    $res = false;
-                    break;
+                    return false;
             }
-            return $res;
         } catch (\Exception $e) {
         }
         return false;
@@ -53,7 +48,7 @@ class Collector
      */
     private static function reportSpanByRabbitMQ(&$spans)
     {
-        if (Collector\Span\RabbitMQ::connect()) {
+        if ($spans && Collector\Span\RabbitMQ::connect()) {
             $message = self::encode($spans, Config\Collector::$reportType);
             if (Config\Collector::$reportCompress == TraceEnv::COMPRESS_ON) {
                 $message = gzdeflate($message);

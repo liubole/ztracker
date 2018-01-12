@@ -135,8 +135,8 @@ function apiInit()
             ->addAnnotation('sr')
     );
 
-    Tracer::span()->decision->traceOn();//影响
-    Tracer::span()->decision->isReportOn();//暂时不用
+    Tracer::span()->decision->traceOn();//暂时不用
+    Tracer::span()->decision->reportOn();//
     Tracer::span()->decision->logOn();//影响span记录/上报
 
     Tracer::span()->putTag('Output', $output);

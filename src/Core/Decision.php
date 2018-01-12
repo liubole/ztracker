@@ -53,7 +53,7 @@ class Decision
         return true;
     }
 
-    public function isReportOn()
+    public function reportOn()
     {
         if (!isset($this->decision)) {
             return true;

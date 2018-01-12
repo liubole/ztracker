@@ -82,12 +82,22 @@ class Tracer
         foreach (self::$reportSpans as &$span) {
             $span = $span->getToReport();
         }
-        $associate = self::span()
-            ? array('traceId' => self::span()->traceId, 'spanId' => self::span()->id,)
-            : array();
-        $logs = self::$logs
-            ? array_merge($associate, self::$logs)
-            : null;
-        Collector::collect(self::$reportSpans, $logs);
+        $reportOn = self::span()->decision
+            ? self::span()->decision->reportOn()
+            : true;
+        $logOn = self::span()->decision
+            ? self::span()->decision->logOn()
+            : true;
+        $logs = $spans = null;
+        if ($reportOn && self::$reportSpans) {
+            $spans =& self::$reportSpans;
+        }
+        if ($logOn && self::$logs) {
+            $associate = self::span()
+                ? array('traceId' => self::span()->traceId, 'spanId' => self::span()->id,)
+                : array();
+            $logs = array_merge($associate, self::$logs);
+        }
+        Collector::collect($spans, $logs);
     }
 }
