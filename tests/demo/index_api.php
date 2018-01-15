@@ -45,7 +45,7 @@ function apiRpc()
     $headers = array();
     $tracer = GlobalTracer::tracer();
     $span = $tracer->newChildSpan()
-        ->name(Util::getServerApiByUrl($url))
+        ->name(Util::urlServerApi($url))
         ->shared(1)
         ->kind(SpanKind\Client);
     $tracer->injector(CarrierType\HttpHeader)->inject($headers);

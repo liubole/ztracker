@@ -21,7 +21,6 @@ class Util
 
     public static function duration($start, $end)
     {
-//        return bcsub(substr($end, 11) . substr($end, 1, 9), substr($start, 11) . substr($start, 1, 9), 8);
         return bcsub($end, $start, 8);
     }
 
@@ -105,14 +104,16 @@ class Util
         return '';
     }
 
-    public static function getServerApiByUrl($url)
+    public static function urlServerApi($url)
     {
-        $url = strpos($url, 'http') === 0 ? substr($url, strpos($url, '/') + 2) : $url;
-        $url = strpos($url, '#') !== false ? substr($url, 0, strpos($url, '#')) : $url;
-        if (($idx = strpos($url, '?')) !== false) {
-            return substr($url, 0, $idx);
-        }
-        return $url;
+        $vars = parse_url($url);
+        return isset($vars['path']) ? $vars['path'] : '/';
+    }
+
+    public static function urlQueryParams($url)
+    {
+        $vars = parse_url($url);
+        return isset($vars['query']) ? $vars['query'] : '';
     }
 
     public static function getServerApi()
