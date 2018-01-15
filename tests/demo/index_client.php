@@ -28,7 +28,7 @@ function clientContent()
             ->decision(GlobalTracer::decisionBuilder($sampleRate));
     }
     $tracer->currentSpan()->putTag('', '');
-    $tracer->currentContext()->set("key0", "value0");
+    $tracer->setContext("key0", "value0");
 
     {
         // rpc

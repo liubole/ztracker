@@ -99,6 +99,17 @@ class SimpleTracer
     }
 
     /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function setContext($key, $value)
+    {
+        $this->currentContext()->set($key, $value);
+        return $this;
+    }
+
+    /**
      * @param Context|null $context
      * @return Context
      */
