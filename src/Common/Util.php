@@ -104,13 +104,19 @@ class Util
         return '';
     }
 
-    public static function urlServerApi($url)
+    public static function urlPath($url)
     {
         $vars = parse_url($url);
         return isset($vars['path']) ? $vars['path'] : '/';
     }
 
-    public static function urlQueryParams($url)
+    public static function urlHost($url)
+    {
+        $vars = parse_url($url);
+        return isset($vars['host']) ? $vars['host'] : '';
+    }
+
+    public static function urlQuery($url)
     {
         $vars = parse_url($url);
         return isset($vars['query']) ? $vars['query'] : '';

@@ -56,7 +56,7 @@ function clientDoRpc()
     $headers = array();
     $tracer = GlobalTracer::tracer();
     $span = $tracer->newChildSpan()
-        ->name(Util::urlServerApi($url))
+        ->name(Util::urlPath($url))
         ->shared(1)
         ->kind(SpanKind\Client)
         /**->remoteEndpoint(
