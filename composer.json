@@ -36,6 +36,6 @@
     "psr-4": {
       "Tricolor\\ZTracker\\": "src/"
     },
-    "files": ["./src/Core/SpanKind.php", "./src/Core/Decoder.php", "./src/Core/CarrierType.php"]
+    "files": ["./src/Core/SpanKind.php", "./src/Core/Decoder.php", "./src/Carrier/CarrierType.php"]
   }
 }
