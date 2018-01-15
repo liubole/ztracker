@@ -277,8 +277,8 @@ class Span
     public function putTag($key, $value)
     {
         if ($this->tags == null) $this->tags = array();
-        if ($key == null) throw new NullPointerException("key == null");
-        if ($value == null) throw new NullPointerException("value of " . $key . " == null");
+        if (is_null($key)) throw new NullPointerException("key == null");
+        if (is_null($value)) throw new NullPointerException("value of " . $key . " == null");
         $this->tags[$key] = $value;
         return $this;
     }
