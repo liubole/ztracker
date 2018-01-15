@@ -7,9 +7,10 @@
 namespace Tricolor\ZTracker\Carrier;
 use Tricolor\ZTracker\Common\Util;
 use Tricolor\ZTracker\Core\Context;
+use Tricolor\ZTracker\Core\GlobalTracer;
 use Tricolor\ZTracker\Core\Span;
 
-class HttpHeaders
+class HttpHeaders implements Base
 {
     private static $prefix = 'Tr-';
     private $headers;
@@ -88,7 +89,7 @@ class HttpHeaders
                 $span[substr($key, strlen($prefix))] = $val;
             }
         }
-        $this->span = (new Span())
+        $this->span = GlobalTracer::spanBuilder()
             ->traceId($span['TraceId'])
             ->id($span['SpanId'])
             ->parentId($span['ParentId'])
@@ -107,8 +108,7 @@ class HttpHeaders
     }
 
     /**
-     * @return mixed
-     * @return Context
+     * @return Span
      */
     public function getSpan()
     {

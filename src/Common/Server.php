@@ -30,9 +30,9 @@ class Server
     {
         if (!isset($_SERVER) || !isset($_SERVER['REQUEST_URI'])) return '';
         if (($idx = strpos($_SERVER['REQUEST_URI'], '?')) !== false) {
-            return $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, $idx);
+            return substr($_SERVER['REQUEST_URI'], 0, $idx);
         }
-        return $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        return $_SERVER['REQUEST_URI'];
     }
 
     public static function getServerIp()

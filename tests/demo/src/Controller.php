@@ -6,6 +6,8 @@
  */
 namespace Tricolor\Tracker\Demo;
 
+use Tricolor\ZTracker\Core\GlobalTracer;
+
 class Controller
 {
     private static $instance;
@@ -40,10 +42,12 @@ class Controller
     public function output($output, $noencode = false)
     {
         $id = defined('CLIENTID') ? CLIENTID : '';
-        Tracer::instance()
-            ->tag('Return')
-            ->log($id . 'Output', $output)
-            ->run();
+
+        $tracer = GlobalTracer::tracer();
+        $tracer->log($id . 'Output', $output);
+        $tracer->currentSpan()->end();
+        $tracer->flush();
+        
         echo json_encode($output);
         die();
     }

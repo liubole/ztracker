@@ -4,7 +4,7 @@
  * Date: 2018/1/10
  * Time: 14:05
  */
-namespace Tricolor\ZTracker\Core;
+namespace Tricolor\ZTracker\Server;
 
 class Trace
 {

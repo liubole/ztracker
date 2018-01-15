@@ -8,159 +8,88 @@ include_once __DIR__ . "/vendor/autoload.php";
 include_once __DIR__ . "/../../vendor/autoload.php";
 include_once __DIR__ . "/config.php";
 
-use \Tricolor\ZTracker\GlobalTracer;
-use \Tricolor\ZTracker\Tracer;
-use \Tricolor\ZTracker\Common\Server;
-use \Tricolor\ZTracker\Carrier\CarrierType;
+use \Tricolor\ZTracker\Core\GlobalTracer;
 use \Tricolor\ZTracker\Common\Util;
-use \Tricolor\ZTracker\Core\Enum\SpanKind;
+use \Tricolor\ZTracker\Carrier\CarrierType;
+use \Tricolor\ZTracker\Core\SpanKind;
 
 define('CLIENTID', 'Client');
 $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 
-function clientInit()
+function clientContent()
 {
-    //开关
-    $sampleRate = 50;
-    $timestamp = Util::current();
-    Tracer::localEndpoint(
-        $localEndpoint = GlobalTracer::endpointBuilder()
-            ->serviceName(Server::getServerApi())
-            ->ip(Server::getServerIp())
-            ->port(Server::getServerPort())
-    );
-    Tracer::span(
-        $currentSpan = GlobalTracer::spanBuilder()
-            ->traceId(Util::uuid())
-            ->id(Util::spanId())
-            ->name(Server::getServerApi())
-            ->localEndpoint($localEndpoint)
-            ->decision(GlobalTracer::decisionBuilder($sampleRate))
-            ->kind(SpanKind::CLIENT)
-            ->addAnnotation('cr', $timestamp)
-    );
-    Tracer::context(
-        $context = GlobalTracer::contextBuilder()
-    );
-}
+    // index
+    $tracer = GlobalTracer::tracer();
+    {
+        $sampleRate = 50;
+        $tracer->newSpan()
+            ->kind(SpanKind\Server)
+            ->shared(0)
+            ->decision(GlobalTracer::decisionBuilder($sampleRate));
+    }
+    $tracer->currentSpan()->putTag('', '');
+    $tracer->currentContext()->set("key0", "value0");
 
-function client()
-{
-    //添加记录
-    Tracer::span()->addAnnotation('');
-    Tracer::span()->putTag('', '');
+    {
+        // rpc
+        clientDoRpc();
+    }
 
-    //设置透传
-    Tracer::context()->set("key0", "value0");
-
-    // rpc
-    clientRpc();
+    {
+        // mysql
+        clientMysql();
+    }
 
     //添加记录
-    Tracer::span()->putTag('YourKey', 'your value');
+    $tracer->currentSpan()->putTag('YourKey', 'your value')->end();
+    $tracer->currentSpan()->end();
 
     fastcgi_finish_request();
+
     //记录
-    Tracer::span()->addAnnotation('cs');
-    Tracer::flush();
+    $tracer->flush();
+}
+
+function clientDoRpc()
+{
+    $url = "";
+    $headers = array();
+    $tracer = GlobalTracer::tracer();
+    $span = $tracer->newChildSpan()
+        ->name(Util::getServerApiByUrl($url))
+        ->shared(1)
+        ->kind(SpanKind\Client)
+        /**->remoteEndpoint(
+            GlobalTracer::endpointBuilder()
+                ->serviceName('mysql')
+                ->ip('127.0.0.1')
+                ->port('1234')
+        )*/;
+    $tracer->injector(CarrierType\HttpHeader)->inject($headers);
+    {
+        // real rpc
+    }
+    $span->end();
 }
 
 function clientMysql()
 {
-    $span = GlobalTracer::spanBuilder()
-        ->childOf(Tracer::span())//no need to call traceId() & id() & parentId()
-        ->name('mysql.ylcf_user.query')
+    $tracer = GlobalTracer::tracer();
+    $span = $tracer->newChildSpan()
+        ->name('mysql.user.query')
         ->shared(false)
-        ->localEndpoint(Tracer::localEndpoint())
+        ->kind(SpanKind\Client)
         ->remoteEndpoint(
-            $remoteEndpoint = GlobalTracer::endpointBuilder()
+            GlobalTracer::endpointBuilder()
                 ->serviceName('mysql')
                 ->ip('127.0.0.1')
-                ->port('1234'));
-    $span->addAnnotation('cs', $cs = Util::current());
-    //do query
-    {}
-    //end query
-    $span->addAnnotation('cr', $cr = Util::current());
-    $span->duration(Util::duration($cs, $cr));
-    Tracer::joinSpans($span);
+                ->port('1234')
+        );
+    {
+        // real query
+    }
+    $span->end();
 }
 
-function clientRpc()
-{
-    $headers = array();
-    $span = GlobalTracer::spanBuilder()
-        ->childOf(Tracer::span())
-        ->name('mysql.api')
-        ->shared(true)
-        ->localEndpoint(Tracer::localEndpoint())
-        ->addAnnotation('cs', $cs = Util::current());
-    GlobalTracer::newCarrier(CarrierType\HttpHeader)
-        ->pipe($headers)
-        ->span($span)
-        ->context(Tracer::context())
-        ->inject();
-    // do rpc
-    {}
-    // end rpc
-    $span->addAnnotation('cr', $cr = Util::current());
-    $span->duration(Util::duration($cs, $cr));
-    Tracer::joinSpans($span);
-}
 
-function apiInit()
-{
-    //segment3:api
-    //大括号表示在另一个span里
-    $carrier = GlobalTracer::newCarrier(CarrierType\HttpHeader)
-        ->pipe($_SERVER)
-        ->extract();
-    Tracer::context(
-        $context = $carrier->getContext()
-    );
-    $fatherSpan = $carrier->getSpan();
-    Tracer::localEndpoint(
-        $localEndpoint = GlobalTracer::endpointBuilder()
-            ->serviceName(Server::getServerApi())
-            ->ip(Server::getServerIp())
-            ->port(Server::getServerPort())
-    );
-    //创建span
-    Tracer::span(
-        $currentSpan = GlobalTracer::spanBuilder()
-            ->childOf($fatherSpan)
-            ->name(Server::getServerApi())
-            ->kind(SpanKind::SERVER)
-            ->localEndpoint(Tracer::localEndpoint())
-            ->addAnnotation('sr')
-    );
-
-    Tracer::span()->decision->traceOn();//暂时不用
-    Tracer::span()->decision->reportOn();//
-    Tracer::span()->decision->logOn();//影响span记录/上报
-
-    Tracer::span()->putTag('Output', $output);
-
-    fastcgi_finish_request();
-
-    Tracer::flush();
-}
-
-function apiRpc()
-{
-    $headers = array();
-    GlobalTracer::newCarrier(CarrierType\HttpHeader)
-        ->pipe($headers)
-        ->span(Tracer::span())
-        ->context(Tracer::context())
-        ->inject();
-}
-
-function api()
-{
-    //获取透传
-    $value0 = Tracer::context()->get('key0');
-
-
-}
 

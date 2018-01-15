@@ -6,9 +6,7 @@
  */
 namespace Tricolor\Tracker\Demo;
 
-use Tricolor\ZTracker\GlobalTracer;
-use \Tricolor\ZTracker\GlobalTracer;
-use \Tricolor\ZTracker\Common\Server;
+use \Tricolor\ZTracker\Core\GlobalTracer;
 use \Tricolor\ZTracker\Carrier\CarrierType;
 
 class Rpc

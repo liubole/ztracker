@@ -4,7 +4,7 @@
  * Date: 2018/1/9
  * Time: 16:32
  */
-namespace Tricolor\ZTracker\Core;
+namespace Tricolor\ZTracker\Server;
 
 use Tricolor\ZTracker\Common\JsonCodec;
 use Tricolor\ZTracker\Common\Util;
@@ -28,26 +28,27 @@ class Span
      * Long
      */
     public $parentId;
+
     /**
      * @var Decision
      */
     public $decision;
+
     /**
      * @var Endpoint
      */
     public $localEndpoint;
+
     /**
      * @var
      */
     public $kind;
-    /**
-     * @var boolean
-     */
-    public $shared;
+
     /**
      * @var Endpoint
      */
     public $remoteEndpoint;
+
     /**
      * Long
      */
@@ -56,6 +57,11 @@ class Span
      * Long
      */
     public $duration;
+
+    /**
+     * @var array<Annotation>
+     */
+    public $annotations;
     /**
      * @var array
      */
@@ -80,6 +86,7 @@ class Span
         $this->duration = null;
         $this->localEndpoint = null;
         $this->remoteEndpoint = null;
+        if ($this->annotations != null) $this->annotations = null;
         if ($this->tags != null) $this->tags = null;
         $this->debug = null;
         return $this;
@@ -97,6 +104,9 @@ class Span
         $result->duration = $this->duration;
         $result->localEndpoint = $this->localEndpoint;
         $result->remoteEndpoint = $this->remoteEndpoint;
+        if ($this->annotations != null) {
+            $result->annotations = (array)$this->annotations;
+        }
         if ($this->tags != null) {
             $result->tags = (array)$this->tags;
         }
@@ -147,6 +157,10 @@ class Span
             $this->timestamp = min($this->timestamp, $that->timestamp);
             $this->duration = max($thisEndTs, $thatEndTs) - $this->timestamp;
         }
+
+        foreach ($that->annotations as $a) {
+            $this->addAnnotation($a);
+        }
         if ($this->debug == null) {
             $this->debug = $that->debug;
         }
@@ -156,7 +170,7 @@ class Span
     /**
      * @see Span#name
      * @param $name
-     * @return Span
+     * @return $this
      */
     public function name($name)
     {
@@ -166,14 +180,14 @@ class Span
 
     public function shared($shared)
     {
-        $this->shared = (int)$shared;
+        $this->shared = $shared;
         return $this;
     }
 
     /**
      * @see Span#traceId
      * @param $traceId
-     * @return Span
+     * @return $this
      */
     public function traceId($traceId)
     {
@@ -184,7 +198,7 @@ class Span
     /**
      * @see Span#id
      * @param $id
-     * @return Span
+     * @return $this
      */
     public function id($id)
     {
@@ -195,7 +209,7 @@ class Span
     /**
      * @see Span#parentId
      * @param $parentId
-     * @return Span
+     * @return $this
      */
     public function parentId($parentId)
     {
@@ -206,7 +220,7 @@ class Span
     /**
      * @see Span#timestamp
      * @param $timestamp
-     * @return Span
+     * @return $this
      */
     public function timestamp($timestamp)
     {
@@ -217,7 +231,7 @@ class Span
     /**
      * @see Span#duration
      * @param $duration
-     * @return Span
+     * @return $this
      */
     public function duration($duration)
     {
@@ -227,7 +241,7 @@ class Span
 
     /**
      * @param Decision $decision
-     * @return Span
+     * @return $this
      */
     public function decision(Decision $decision)
     {
@@ -237,7 +251,7 @@ class Span
 
     /**
      * @param $kind
-     * @return Span
+     * @return $this
      */
     public function kind($kind)
     {
@@ -248,7 +262,7 @@ class Span
     /**
      * @see Span#localEndpoint
      * @param Endpoint $localEndpoint
-     * @return Span
+     * @return $this
      */
     public function localEndpoint(Endpoint $localEndpoint)
     {
@@ -259,7 +273,7 @@ class Span
     /**
      * @see Span#remoteEndpoint
      * @param Endpoint $remoteEndpoint
-     * @return Span
+     * @return $this
      */
     public function remoteEndpoint(Endpoint $remoteEndpoint)
     {
@@ -271,7 +285,7 @@ class Span
      * @see Span#tags
      * @param $key
      * @param $value
-     * @return Span
+     * @return $this
      * @throws NullPointerException
      */
     public function putTag($key, $value)
@@ -284,23 +298,29 @@ class Span
     }
 
     /**
-     * 
-     */
-    public function end()
-    {
-        $this->duration(Util::duration($this->timestamp, Util::current()));
-    }
-
-    /**
      * @see Span#debug
      * @param $debug
-     * @return Span
+     * @return $this
      */
     public function debug($debug)
     {
         $this->debug = $debug;
         return $this;
     }
+
+    /**
+     * Replaces currently collected annotations.
+     *
+     * @see Span#annotations
+     * @param array $annotations
+     * @return $this
+     */
+    public function annotations(array $annotations)
+    {
+        $this->annotations = $annotations;
+        return $this;
+    }
+
     /**
      * @return string
      */
@@ -334,6 +354,24 @@ class Span
     }
 
     /**
+     * @see Span#annotations
+     * @param $value string Annotation.value
+     * @param $timestamp string Annotation.timestamp
+     * @return $this
+     */
+    public function addAnnotation($value, $timestamp = null)
+    {
+        if ($this->annotations == null) {
+            $this->annotations = array();
+        }
+        $timestamp = $timestamp ? $timestamp : Util::current();
+        $annotation = new Annotation();
+        $annotation = $annotation->timestamp($timestamp)->value((string)$value);
+        array_push($this->annotations, $annotation);
+        return $this;
+    }
+
+    /**
      * Compares by {@link #timestamp}, then {@link #name}.
      * @param Span $that
      * @return int
@@ -355,6 +393,27 @@ class Span
     public function idString()
     {
         return $this->traceId . '.' . $this->id . '<:' . $this->parentId;
+    }
+
+    /**
+     * Returns the distinct {@link Endpoint#serviceName service names} that logged to this span.
+     * Set<String>
+     * @return array
+     */
+    public function serviceNames()
+    {
+        $result = array();
+        foreach ($this->annotations as $a) {
+            if ($a->endpoint == null) continue;
+            if (empty($a->endpoint->serviceName)) continue;
+            array_push($result, $a->endpoint->serviceName);
+        }
+        foreach ($this->binaryAnnotations as $a) {
+            if ($a->endpoint == null) continue;
+            if (empty($a->endpoint->serviceName)) continue;
+            array_push($result, $a->endpoint->serviceName);
+        }
+        return array_unique($result);
     }
 
     public function getToReport()

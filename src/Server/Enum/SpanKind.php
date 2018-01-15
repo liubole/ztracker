@@ -4,7 +4,7 @@
  * Date: 2018/1/10
  * Time: 11:37
  */
-namespace Tricolor\ZTracker\Core\Enum;
+namespace Tricolor\ZTracker\Server\Enum;
 
 class SpanKind
 {

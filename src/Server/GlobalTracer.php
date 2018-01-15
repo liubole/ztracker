@@ -4,20 +4,17 @@
  * Date: 2017/11/4
  * Time: 20:41
  */
-namespace Tricolor\ZTracker;
+namespace Tricolor\ZTracker\Server;
 use Tricolor\ZTracker\Carrier\HttpHeaders;
 use Tricolor\ZTracker\Carrier\RabbitMQHeaders;
 use Tricolor\ZTracker\Common\Util;
-use Tricolor\ZTracker\Core\Context;
-use Tricolor\ZTracker\Core\Decision;
-use Tricolor\ZTracker\Core\Endpoint;
-use Tricolor\ZTracker\Core\Span;
+use Tricolor\ZTracker\Carrier\CarrierType;
 
 class GlobalTracer
 {
 
     /**
-     * @return Core\Context
+     * @return Context
      */
     public static function contextBuilder()
     {
@@ -48,9 +45,9 @@ class GlobalTracer
     public static function newCarrier($carrier)
     {
         switch ($carrier) {
-            case Carrier\CarrierType\HttpHeader:
+            case  CarrierType\HttpHeader:
                 return new HttpHeaders();
-            case Carrier\CarrierType\RabbitMQHeader:
+            case CarrierType\RabbitMQHeader:
                 return new RabbitMQHeaders();
         }
         return null;
