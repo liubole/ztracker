@@ -4,7 +4,7 @@
  * Date: 2018/1/4
  * Time: 21:22
  */
-namespace Tricolor\Tracker\Demo;
+namespace Tricolor\ZTracker\Demo;
 
 class Utils
 {

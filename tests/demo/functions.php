@@ -51,10 +51,10 @@ function randUa()
 }
 function randParams()
 {
-    $randStr = \Tricolor\Tracker\Demo\Utils::randStr('alnum', rand(3, 6));
+    $randStr = Tricolor\ZTracker\Demo\Utils::randStr('alnum', rand(3, 6));
     $params = array();
     for($i = 0; $i < strlen($randStr); $i++) {
-        $params[$randStr[$i]] = \Tricolor\Tracker\Demo\Utils::randStr('alpha', rand(10, 20));
+        $params[$randStr[$i]] = Tricolor\ZTracker\Demo\Utils::randStr('alpha', rand(10, 20));
     }
     return $params;
 }

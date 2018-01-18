@@ -7,7 +7,6 @@
 namespace Tricolor\ZTracker\Core;
 
 use Tricolor\ZTracker\Common\Util;
-use Tricolor\ZTracker\Core\Enum\BinaryAnnotationType as Type;
 
 class BinaryAnnotation
 {
@@ -53,13 +52,13 @@ class BinaryAnnotation
      */
     public static function address($key, Endpoint $endpoint)
     {
-        return new BinaryAnnotation($key, array(), Type::BOOL, Util::checkNotNull($endpoint, "endpoint"));
+        return new BinaryAnnotation($key, array(), BinaryAnnotationType::BOOL, Util::checkNotNull($endpoint, "endpoint"));
     }
 
     /**
      * @param $key
-     * @param $value array<byte>|String
-     * @param Type $type
+     * @param $value String|boolean
+     * @param $type int BinaryAnnotationType
      * @param Endpoint $endpoint
      * @return BinaryAnnotation
      */
@@ -69,6 +68,29 @@ class BinaryAnnotation
             $value = pack("H*", $value);
         }
         return new BinaryAnnotation($key, $value, $type, $endpoint);
+    }
+
+    /**
+     * @param $o
+     * @return bool
+     */
+    public function equals($o)
+    {
+        if ($o instanceof BinaryAnnotation) {
+            return $o == $this;
+        }
+        if (is_array($o)) {
+            return $o == get_object_vars($this);
+        }
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function hashCode()
+    {
+        return spl_object_hash($this);
     }
 
     public function __construct($key, array $value, $type, Endpoint $endpoint)

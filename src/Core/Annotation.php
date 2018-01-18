@@ -6,8 +6,6 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Common\Util;
-
 class Annotation
 {
     /**
@@ -36,6 +34,12 @@ class Annotation
     {
     }
 
+    /**
+     * @param $timestamp
+     * @param $value
+     * @param Endpoint $endpoint
+     * @return Annotation
+     */
     public static function create($timestamp, $value, Endpoint $endpoint)
     {
         return new Annotation($timestamp, $value, $endpoint);
@@ -74,6 +78,10 @@ class Annotation
         return $this;
     }
 
+    /**
+     * @param $o
+     * @return bool
+     */
     public function equals($o)
     {
         if ($o instanceof Annotation) {
@@ -85,6 +93,9 @@ class Annotation
         return false;
     }
 
+    /**
+     * @return string
+     */
     public function hashCode()
     {
         return spl_object_hash($this);
@@ -103,6 +114,21 @@ class Annotation
         return substr_compare($this->value, $that->value, 0);
     }
 
+    /**
+     * @param $vars
+     * @return Annotation
+     */
+    public static function revertFromArray($vars)
+    {
+        if (is_array($vars['endpoint'])) {
+            $vars['endpoint'] = Endpoint::revertFromArray($vars['endpoint']);
+        }
+        return self::create($vars['timestamp'], $vars['value'], $vars['endpoint']);
+    }
+
+    /**
+     * @return array
+     */
     public function convertToArray()
     {
         return get_object_vars($this);

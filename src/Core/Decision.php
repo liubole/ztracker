@@ -81,7 +81,19 @@ class Decision
         return true;
     }
 
-    public function toArray()
+    /**
+     * @param $val
+     * @return Decision
+     */
+    public static function revertFromInt($val)
+    {
+        return new Decision($val);
+    }
+
+    /**
+     * @return null|int
+     */
+    public function convertToInt()
     {
         return $this->decision;
     }

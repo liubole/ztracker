@@ -5,73 +5,137 @@
  * Time: 9:33
  */
 namespace Tricolor\ZTracker\Carrier;
+
 use PhpAmqpLib\Wire\AMQPTable;
-use Tricolor\Tracker\Common\StrUtils;
-use Tricolor\Tracker\Core\Context;
+use Tricolor\ZTracker\Common;
+use Tricolor\ZTracker\Core;
 
 class RabbitMQHeaders implements Base
 {
-    private $prefix = 'Tr-';
-    private $msgObj;
-
+    private static $prefix = 'Tr-';
     /**
-     * RabbitMQHeaders constructor.
-     * @param $msgObj \PhpAmqpLib\Message\AMQPMessage
+     * @var \PhpAmqpLib\Message\AMQPMessage
      */
+    private $msg;
+    private $context;
+    private $span;
+
     public function __construct()
     {
-        $this->msgObj = &$msgObj;
     }
 
     /**
-     * @return bool
+     * @param $msg
+     * @return RabbitMQHeaders
      */
-    public function unpack()
+    public function pipe(&$msg)
     {
-        if (!is_object($this->msgObj)) return false;
+        $this->msg = &$msg;
+        return $this;
+    }
+
+    /**
+     *
+     * @param Core\Span $span
+     * @return RabbitMQHeaders
+     */
+    public function span(Core\Span $span)
+    {
+        $this->span = $span;
+        return $this;
+    }
+
+    /**
+     * @param $context Core\Context
+     * @return RabbitMQHeaders
+     */
+    public function context(Core\Context $context)
+    {
+        $this->context = $context;
+        return $this;
+    }
+
+    /**
+     * @return RabbitMQHeaders
+     */
+    public function inject()
+    {
+        // span
+        $span = array();
+        $prefix = self::$prefix . "S-";
+        $span[$prefix . "TraceId"] = $this->span->traceId;
+        $span[$prefix . "SpanId"] = $this->span->id;
+        $span[$prefix . "ParentId"] = $this->span->parentId;
+        $span[$prefix . "Decision"] = $this->span->decision->getValue();
+
+        // context
+        $context = array();
+        $prefix = self::$prefix . "C-";
+        foreach(get_object_vars($this->context) as $key => $val) {
+            $context[$prefix . $key] =  $val;
+        }
+        $appends = array_merge($span, $context);
+
+        // inject
         try {
-            $hdr = $this->msgObj->get('application_headers');
+            $hdr = $this->msg->get('application_headers');
+        } catch (\Exception $e) {
+            $hdr = new AMQPTable();
+        }
+        foreach ($appends as $key => $val) {
+            $hdr->set($key, $val, AMQPTable::T_STRING_LONG);
+        }
+        $this->msg->set('application_headers', $hdr);
+
+        return $this;
+    }
+
+    /**
+     * @return RabbitMQHeaders
+     */
+    public function extract()
+    {
+        try {
+            $hdr = $this->msg->get('application_headers');
             $headers = $hdr->getNativeData();
             if (!$headers) {
-                return false;
+                return $this;
             }
         } catch (\Exception $e) {
-            Logger::log(Debug::INFO, __METHOD__ . ': unpack exception : ' . $e->getMessage());
-            return false;
+            return $this;
         }
-        $trace = array();
+
+        $context = $span = array();
         foreach ($headers as $key => $val) {
-            if (StrUtils::startsWith($key, $this->prefix)) {
-                $trace[substr($key, strlen($this->prefix))] = $val;
+            if (Common\Util::startsWith($key, $prefix = self::$prefix . "C-")) {
+                $context[substr($key, strlen($prefix))] = $val;
+            } else if (Common\Util::startsWith($key, $prefix = self::$prefix . "S-")) {
+                $span[substr($key, strlen($prefix))] = $val;
             }
         }
-        if ($trace) {
-            Context::set($trace);
-            return true;
-        }
-        return false;
+        $this->span = Core\GlobalTracer::spanBuilder()
+            ->traceId($span['TraceId'])
+            ->id($span['SpanId'])
+            ->parentId($span['ParentId'])
+            ->decision($span['Decision']);
+        $this->context = new Core\Context();
+        foreach ($context as $k => $v) { $this->context->set($k, $v);}
+        return $this;
     }
 
     /**
-     * @return bool
+     * @return Core\Context
      */
-    public function pack()
+    public function getContext()
     {
-        if (!is_object($this->msgObj)) return false;
-        try {
-            try {
-                $hdr = $this->msgObj->get('application_headers');
-            } catch (\Exception $e) {
-                $hdr = new AMQPTable();
-            }
-            foreach (Context::toArray() as $k => $v) {
-                $hdr->set($this->prefix . $k, $v, AMQPTable::T_STRING_LONG);
-            }
-            $this->msgObj->set('application_headers', $hdr);
-            return true;
-        } catch (\Exception $e) {
-            Logger::log(Debug::INFO, __METHOD__ . ': pack exception : ' . $e->getMessage());
-        }
-        return false;
+        return $this->context;
+    }
+
+    /**
+     * @return Core\Span
+     */
+    public function getSpan()
+    {
+        return $this->span;
     }
 }

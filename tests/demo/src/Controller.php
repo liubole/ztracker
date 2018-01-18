@@ -4,7 +4,7 @@
  * Date: 2018/1/4
  * Time: 22:12
  */
-namespace Tricolor\Tracker\Demo;
+namespace Tricolor\ZTracker\Demo;
 
 use Tricolor\ZTracker\Core\GlobalTracer;
 

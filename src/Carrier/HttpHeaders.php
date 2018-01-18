@@ -5,10 +5,9 @@
  * Time: 9:32
  */
 namespace Tricolor\ZTracker\Carrier;
-use Tricolor\ZTracker\Common\Util;
-use Tricolor\ZTracker\Core\Context;
-use Tricolor\ZTracker\Core\GlobalTracer;
-use Tricolor\ZTracker\Core\Span;
+
+use Tricolor\ZTracker\Core;
+use Tricolor\ZTracker\Common;
 
 class HttpHeaders implements Base
 {
@@ -33,20 +32,20 @@ class HttpHeaders implements Base
 
     /**
      *
-     * @param Span $span
+     * @param Core\Span $span
      * @return $this
      */
-    public function span(Span $span)
+    public function span(Core\Span $span)
     {
         $this->span = $span;
         return $this;
     }
 
     /**
-     * @param $context Context
+     * @param $context Core\Context
      * @return HttpHeaders
      */
-    public function context(Context $context)
+    public function context(Core\Context $context)
     {
         $this->context = $context;
         return $this;
@@ -57,7 +56,7 @@ class HttpHeaders implements Base
      */
     public function inject()
     {
-        //span
+        // span
         $span = array();
         $prefix = self::$prefix . "S-";
         $span[] = $prefix . "TraceId: " . $this->span->traceId;
@@ -65,13 +64,18 @@ class HttpHeaders implements Base
         $span[] = $prefix . "ParentId: " . $this->span->parentId;
         $span[] = $prefix . "Decision: " . $this->span->decision->getValue();
 
-        //context
+        // context
         $context = array();
         $prefix = self::$prefix . "C-";
         foreach(get_object_vars($this->context) as $key => $val) {
             $context[] = $prefix . $key . ": " . $val;
         }
-        $this->headers = array_merge($span, $context);
+        $appends = array_merge($span, $context);
+
+        // inject
+        foreach ($appends as $v) {
+            $this->headers[] = $v;
+        }
 
         return $this;
     }
@@ -83,24 +87,24 @@ class HttpHeaders implements Base
     {
         $context = $span = array();
         foreach ($this->headers as $key => $val) {
-            if (Util::startsWith($key, $prefix = self::$prefix . "C-")) {
+            if (Common\Util::startsWith($key, $prefix = self::$prefix . "C-")) {
                 $context[substr($key, strlen($prefix))] = $val;
-            } else if (Util::startsWith($key, $prefix = self::$prefix . "S-")) {
+            } else if (Common\Util::startsWith($key, $prefix = self::$prefix . "S-")) {
                 $span[substr($key, strlen($prefix))] = $val;
             }
         }
-        $this->span = GlobalTracer::spanBuilder()
+        $this->span = Core\GlobalTracer::spanBuilder()
             ->traceId($span['TraceId'])
             ->id($span['SpanId'])
             ->parentId($span['ParentId'])
             ->decision($span['Decision']);
-        $this->context = new Context();
+        $this->context = new Core\Context();
         foreach ($context as $k => $v) { $this->context->set($k, $v);}
         return $this;
     }
 
     /**
-     * @return Context
+     * @return Core\Context
      */
     public function getContext()
     {
@@ -108,7 +112,7 @@ class HttpHeaders implements Base
     }
 
     /**
-     * @return Span
+     * @return Core\Span
      */
     public function getSpan()
     {

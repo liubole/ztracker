@@ -6,8 +6,7 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Common\JsonCodec;
-use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Common;
 
 class Endpoint
 {
@@ -73,7 +72,7 @@ class Endpoint
     {
         $endpoint = new Endpoint();
         $endpoint->serviceName =
-            empty(Util::checkNotNull($serviceName, "serviceName"))
+            empty(Common\Util::checkNotNull($serviceName, "serviceName"))
             ? ""
             : strtolower($serviceName);
         $endpoint->ipv4 = $ipv4;
@@ -89,7 +88,7 @@ class Endpoint
      */
     public function serviceName($serviceName)
     {
-        $this->serviceName = $serviceName;
+        $this->serviceName = strtolower($serviceName);
         return $this;
     }
     /**
@@ -105,14 +104,18 @@ class Endpoint
 
     public function parseIp($ip)
     {
-        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             $this->ipv6($ip);
         } else {
             $this->ipv4($ip);
         }
     }
 
-    /** @see Endpoint#ipv4 */
+    /**
+     * @see Endpoint#ipv4
+     * @param $ipv4
+     * @return $this
+     */
     public function ipv4($ipv4)
     {
         $this->ipv4 = $ipv4;
@@ -135,7 +138,7 @@ class Endpoint
             $this->ipv6 = null;
             return $this;
         }
-        Util::checkArgument(strlen($ipv6) == 16, "ipv6 addresses are 16 bytes: " . strlen($ipv6));
+        Common\Util::checkArgument(strlen($ipv6) == 16, "ipv6 addresses are 16 bytes: " . strlen($ipv6));
         $this->ipv6 = $ipv6;
         return $this;
     }
@@ -152,7 +155,7 @@ class Endpoint
      */
     public function port($port)
     {
-        Util::checkArgument($port <= 0xffff, "invalid port %s", $port);
+        Common\Util::checkArgument($port <= 0xffff, "invalid port %s", $port);
         $this->port = $port <= 0 ? null : ($port & 0xffff);
         return $this;
     }
@@ -175,9 +178,21 @@ class Endpoint
 
     public function toString()
     {
-        return JsonCodec::write($this);
+        return Common\JsonCodec::write($this);
     }
 
+    /**
+     * @param $vars
+     * @return Endpoint
+     */
+    public static function revertFromArray($vars)
+    {
+        return self::create($vars['serviceName'], $vars['ipv4'], $vars['ipv6'], $vars['port']);
+    }
+
+    /**
+     * @return array
+     */
     public function convertToArray()
     {
         return get_object_vars($this);

@@ -171,7 +171,7 @@ class SimpleTracer
         }
         foreach ($this->reportSpans as &$span) {
             if ($span instanceof Span)
-                $span = $span->getToReport();
+                $span = $span->convertToArray();
         }
         $reportOn = $this->currentSpan()->decision
             ? $this->currentSpan()->decision->reportOn()
@@ -191,7 +191,7 @@ class SimpleTracer
                 : array();
             $logs = array_merge($associate, $this->logs);
         }
-        Collector::collect($spans, $logs);
+        Reporter::collect($spans, $logs);
     }
 
     /**

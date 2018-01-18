@@ -5,7 +5,8 @@
  * Time: 20:41
  */
 namespace Tricolor\ZTracker\Core;
-use Tricolor\ZTracker\Common\Util;
+
+use Tricolor\ZTracker\Common;
 
 class GlobalTracer
 {
@@ -31,7 +32,7 @@ class GlobalTracer
     public static function spanBuilder()
     {
         $span = new Span();
-        return $span->timestamp(Util::current());
+        return $span->timestamp(Common\Util::current());
     }
 
     /**

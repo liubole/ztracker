@@ -6,8 +6,7 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Common\JsonCodec;
-use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Exception\NullPointerException;
 
 class Span
@@ -48,6 +47,15 @@ class Span
      * @var Endpoint
      */
     public $remoteEndpoint;
+    /**
+     * @var array
+     */
+    public $annotations;
+
+    /**
+     * @var array
+     */
+    public $binaryAnnotations;
     /**
      * Long
      */
@@ -109,7 +117,7 @@ class Span
         $this->traceId($span->traceId)
             ->parentId($span->id)
             ->decision($span->decision)
-            ->id(Util::spanId());
+            ->id(Common\Util::spanId());
         return $this;
     }
 
@@ -119,10 +127,12 @@ class Span
      */
     public function merge(Span $that)
     {
+        if (!$that) {
+            return $this;
+        }
         if ($this->traceId == null) {
             $this->traceId = $that->traceId;
         }
-
         if (($this->name == null) || (strlen($this->name) == 0) || ($this->name == "unknown")) {
             $this->name = $that->name;
         }
@@ -131,6 +141,16 @@ class Span
         }
         if ($this->parentId == null) {
             $this->parentId = $that->parentId;
+        }
+        if ($that->annotations) {
+            foreach ($that->annotations as $a) {
+                $this->hasAnnotation($a) OR $this->addAnnotation($a);
+            }
+        }
+        if ($that->tags) {
+            foreach ($that->tags as $k => $v) {
+                $this->putTag($k, $v);
+            }
         }
 
         // Single timestamp makes duration easy: just choose max
@@ -149,6 +169,28 @@ class Span
         }
         if ($this->debug == null) {
             $this->debug = $that->debug;
+        }
+        return $this;
+    }
+
+    public function hasAnnotation(Annotation $a)
+    {
+        if ($this->annotations) {
+            foreach ($this->annotations as $v) {
+                if ($a == $v) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $vars
+     * @return $this
+     */
+    public function enrich($vars)
+    {
+        foreach (array_intersect_key(get_object_vars($this), $vars) as $key => $val) {
+            $this->$key = $vars[$key];
         }
         return $this;
     }
@@ -288,7 +330,7 @@ class Span
      */
     public function end()
     {
-        $this->duration(Util::duration($this->timestamp, Util::current()));
+        $this->duration(Common\Util::duration($this->timestamp, Common\Util::current()));
     }
 
     /**
@@ -301,12 +343,46 @@ class Span
         $this->debug = $debug;
         return $this;
     }
+
+    /**
+     * @param Annotation $annotation
+     * @return $this
+     */
+    public function addAnnotation(Annotation $annotation)
+    {
+        is_array($this->annotations) OR ($this->annotations = array());
+        $this->annotations[] = $annotation;
+        foreach ($this->annotations as $o) {
+            if ($annotation->equals($o)) {
+                return $this;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @see Span#binaryAnnotations
+     * @param BinaryAnnotation $binaryAnnotation
+     * @return $this
+     */
+    public function addBinaryAnnotation(BinaryAnnotation $binaryAnnotation)
+    {
+        is_array($this->binaryAnnotations) OR ($this->binaryAnnotations = array());
+        foreach ($this->binaryAnnotations as $o) {
+            if ($binaryAnnotation->equals($o)) {
+                return $this;
+            }
+        }
+        $this->binaryAnnotations[] = $binaryAnnotation;
+        return $this;
+    }
+
     /**
      * @return string
      */
     public function toString()
     {
-        return JsonCodec::write($this);
+        return Common\JsonCodec::write($this);
     }
 
     /**
@@ -357,19 +433,48 @@ class Span
         return $this->traceId . '.' . $this->id . '<:' . $this->parentId;
     }
 
-    public function getToReport()
+    /**
+     * @param $vars
+     * @return Span
+     */
+    public static function revertFromArray($vars)
+    {
+        if (!$vars) {
+            return null;
+        }
+        $span = new Span();
+        foreach (array_intersect_key(get_object_vars($span), $vars) as $key => $no_use_val) {
+            if ($span->$key instanceof Decision) {
+                $span->$key = Decision::revertFromInt($vars[$key]);
+            } else if ($span->$key instanceof Endpoint) {
+                $span->$key = Endpoint::revertFromArray($vars[$key]);
+            } else if ($span->$key == 'annotations') {
+                foreach ($span->$key as $k => $v) {
+                    $span->$key[$k] = Annotation::revertFromArray($v);
+                }
+            } else {
+                $span->$key = $vars[$key];
+            }
+        }
+        return $span;
+    }
+
+    /**
+     * @return array
+     */
+    public function convertToArray()
     {
         $array = array();
         if (!isset($this->duration)) {
-            $this->duration = Util::duration($this->timestamp, Util::current());
+            $this->duration = Common\Util::duration($this->timestamp, Common\Util::current());
         }
         foreach (get_object_vars($this) as $key => $val) {
             if ($val instanceof Decision) {
-                $array[$key] = $val->decision;
+                $array[$key] = $val->convertToInt();
             } else if ($val instanceof Endpoint) {
                 $array[$key] = $val->convertToArray();
             } else if (is_array($val) && count($val) > 0) {
-                foreach ($val as $k => $v) {
+                foreach ($val as $k => &$v) {
                     if ($v instanceof Annotation) {
                         $array[$key][$k] = $v->convertToArray();
                     } else {

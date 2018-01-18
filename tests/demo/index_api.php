@@ -8,15 +8,15 @@ include_once __DIR__ . "/vendor/autoload.php";
 include_once __DIR__ . "/../../vendor/autoload.php";
 include_once __DIR__ . "/config.php";
 
-use \Tricolor\ZTracker\Core\GlobalTracer;
-use \Tricolor\ZTracker\Common\Util;
-use \Tricolor\ZTracker\Carrier\CarrierType;
-use \Tricolor\ZTracker\Core\SpanKind;
+use Tricolor\ZTracker\Core\GlobalTracer;
+use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Carrier\CarrierType;
+use Tricolor\ZTracker\Core\SpanKind;
 
 define('CLIENTID', 'Api');
 
 //Collector::$collector = function ($info) {
-//    $call = array('\Tricolor\Tracker\Demo\Logger', 'write');
+//    $call = array('Tricolor\ZTracker\Demo\Logger', 'write');
 //    call_user_func_array($call, array('./logs/', $info));
 //};
 

@@ -31,11 +31,6 @@ class Collector
      */
     public static $reporter = Collector::reporterRabbitMQ;
     /**
-     * Compress or not
-     * @var int
-     */
-    public static $reportCompress = TraceEnv::COMPRESS_ON;
-    /**
      * Report format: 'json' or 'serialize'
      * @var string
      */

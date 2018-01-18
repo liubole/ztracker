@@ -6,7 +6,6 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Common\Util;
 /**
  * Well-known {@link BinaryAnnotation#key binary annotation keys}.
  *

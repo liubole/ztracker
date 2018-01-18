@@ -4,10 +4,11 @@
  * Date: 2018/1/4
  * Time: 21:22
  */
-namespace Tricolor\Tracker\Demo;
+namespace Tricolor\ZTracker\Demo;
 
-use \Tricolor\ZTracker\Core\GlobalTracer;
-use \Tricolor\ZTracker\Carrier\CarrierType;
+use Tricolor\ZTracker\Core;
+use Tricolor\ZTracker\Common;
+use Tricolor\ZTracker\Carrier\CarrierType;
 
 class Rpc
 {
@@ -19,13 +20,16 @@ class Rpc
         $url = $this->url(trim($api, '/'));
         $headers = array();
 
-        GlobalTracer::carrier(CarrierType\HttpHeader)//返回 carrier
-            ->pipe($headers)//返回 carrier
-            ->context($context)
-            ->inject();//返回 carrier
-        $currentSpan->addAnnotation('cs');
+        $tracer = Core\GlobalTracer::tracer();
+        $span = $tracer->newChildSpan()
+            ->name(Common\Util::urlPath($url))
+            ->shared(1)
+            ->kind(Core\SpanKind\Client);
+        $tracer->injector(CarrierType\HttpHeader)->inject($headers);
+
         $response = $this->post($url, $params, $headers);
-        $currentSpan->addAnnotation('cr');
+
+        $span->end();
 
         $output = json_decode($response, 1);
         return $output;

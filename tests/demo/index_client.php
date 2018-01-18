@@ -8,10 +8,10 @@ include_once __DIR__ . "/vendor/autoload.php";
 include_once __DIR__ . "/../../vendor/autoload.php";
 include_once __DIR__ . "/config.php";
 
-use \Tricolor\ZTracker\Core\GlobalTracer;
-use \Tricolor\ZTracker\Common\Util;
-use \Tricolor\ZTracker\Carrier\CarrierType;
-use \Tricolor\ZTracker\Core\SpanKind;
+use Tricolor\ZTracker\Core\GlobalTracer;
+use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Carrier\CarrierType;
+use Tricolor\ZTracker\Core\SpanKind;
 
 define('CLIENTID', 'Client');
 $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';

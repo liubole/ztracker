@@ -17,6 +17,7 @@ vendor/
 # Test Logs
 #------------------------
 tests/demo/logs/*
+tests/nosubmit/*
 
 # Config Files
 #-------------------------
