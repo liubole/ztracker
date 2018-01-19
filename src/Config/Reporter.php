@@ -6,7 +6,7 @@
  */
 namespace Tricolor\ZTracker\Config;
 
-class Collector
+class Reporter
 {
     /**
      * log type: json or serialization
@@ -25,9 +25,9 @@ class Collector
      * Log format: 'json' or 'serialize'
      * @var string
      */
-    public static $logType = Collector::json;
+    public static $logType = Reporter::json;
     /**
      * @var string
      */
-    public static $reporter = Collector::reporterRabbitMQ;
+    public static $reporter = Reporter::reporterRabbitMQ;
 }

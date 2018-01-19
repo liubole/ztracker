@@ -12,15 +12,17 @@ class Job
      * Handler constructor.
      * @param array $signals
      */
-    public function __construct($signals = array(SIGTERM))
+    public function __construct($signals = null)
     {
         echo get_class($this) . " start!" . PHP_EOL;
-
-        $that = &$this;
-        foreach ($signals as $signal) {
-            $this->regSig($signal, function () use (&$that) {
-                $that->signal(SIGTERM);
-            });
+        if (extension_loaded('pcntl')) {
+            $signals = isset($signals) ? $signals : array(SIGTERM);
+            $that = &$this;
+            foreach ($signals as $signal) {
+                $this->regSig($signal, function () use (&$that) {
+                    $that->signal(SIGTERM);
+                });
+            }
         }
     }
 

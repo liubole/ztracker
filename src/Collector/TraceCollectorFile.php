@@ -20,14 +20,14 @@ class TraceCollectorFile
 
     public static function ready()
     {
-        $root = Config\BizLogger::$root;
+        $root = Config\TraceCollector::$root;
         if (!$root) {
             return false;
         }
         if (!is_dir($root) AND !mkdir($root, 766, true)) {
             return false;
         }
-        $logname = Config\BizLogger::$log_name;
+        $logname = Config\TraceCollector::$log_name;
         $file = rtrim($root, '/') . '/' . ($logname ? $logname : "trace.log");
         if (file_exists($file) OR touch($file)) {
             return $file;

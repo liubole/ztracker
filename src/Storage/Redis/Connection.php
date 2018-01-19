@@ -14,7 +14,7 @@ class Connection
 
     /**
      * @param $config
-     * @return \Redis
+     * @return \Redis|null
      * @throws \Exception
      */
     public static function getConnection($config)
@@ -23,15 +23,15 @@ class Connection
             $host = Util::checkNotNull($config['host'], 'redis config.host is null!');
             $port = Util::checkNotNull($config['port'], 'redis config.port is null!');
             $timeout = (int)$config['timeout'];
-            $uniq = '_' . $host . '_' . $port;
-            if (!self::$conns[$uniq]) {
+            $key = '_' . $host . '_' . $port;
+            if (!isset(self::$conns[$key]) || !self::$conns[$key]) {
                 $redis = new \Redis();
                 $redis->pconnect($host,$port, $timeout);
-                self::$conns[$uniq] = $redis;
+                self::$conns[$key] = $redis;
             }
+            return self::$conns[$key];
         } catch (\Exception $e) {
             throw $e;
         }
-        return self::$conns[$uniq];
     }
 }

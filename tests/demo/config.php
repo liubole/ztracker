@@ -9,4 +9,4 @@ include_once __DIR__ . "/../config/trace_rabbitmq.php";
 use Tricolor\ZTracker\Config;
 
 Config\BizLogger::$root = __DIR__ . '/logs';
-Config\TraceCollector::set($trace_rabbitmq);
+Config\TraceCollector::rabbitConfig($trace_rabbitmq);

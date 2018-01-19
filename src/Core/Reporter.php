@@ -31,10 +31,10 @@ class Reporter
     private static function reportSpans(&$spans)
     {
         try {
-            switch (Config\Collector::$reporter) {
-                case Config\Collector::reporterRabbitMQ:
+            switch (Config\Reporter::$reporter) {
+                case Config\Reporter::reporterRabbitMQ:
                     return self::reportSpanByRabbitMQ($spans);
-                case Config\Collector::reporterFile:
+                case Config\Reporter::reporterFile:
                     return self::reportSpanToFile($spans);
                 default:
                     return false;
@@ -79,7 +79,7 @@ class Reporter
     private static function logLogs(&$logs)
     {
         if ($logs && Collector\BizLoggerFile::ready()) {
-            $message = self::encode($logs, Config\Collector::$logType);
+            $message = self::encode($logs, Config\Reporter::$logType);
             return Collector\BizLoggerFile::write($message);
         }
         return false;
@@ -95,10 +95,10 @@ class Reporter
     {
         try {
             switch ($type) {
-                case Config\Collector::json:
+                case Config\Reporter::json:
                     $message = @json_encode($vars);
                     break;
-                case Config\Collector::serialize:
+                case Config\Reporter::serialize:
                     $message = @serialize($vars);
                     break;
                 default:
@@ -121,9 +121,9 @@ class Reporter
         try {
             $str = $compressed ? gzinflate($str) : $str;
             switch ($type) {
-                case Config\Collector::json:
+                case Config\Reporter::json:
                     return @json_decode($str, 1);
-                case Config\Collector::serialize:
+                case Config\Reporter::serialize:
                     return @unserialize($str);
                 default:
                     break;

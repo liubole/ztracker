@@ -34,12 +34,12 @@ class TraceCollector
         'heartbeat' => 0,
     );
 
-    public static function get()
+    public static function getRabbitConfig()
     {
         return self::$rabbit_config;
     }
 
-    public static function set($config)
+    public static function rabbitConfig($config)
     {
         if (is_array($config)) {
             self::$rabbit_config = array_merge(self::$rabbit_config, $config);

@@ -5,15 +5,35 @@
  * Time: 17:43
  */
 namespace Tricolor\ZTracker\Server\Shell;
-include_once __DIR__ . "/../../../vendor/autoload.php";
 
 use Tricolor\ZTracker\Collector;
 use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Server;
 
-$span_handler = new Server\Jobs\Trace();
-Collector\TraceCollectorRabbitMQ::sub(function ($msg) use (&$span_handler) {
-    $body = $msg->body;
-    $spans = Common\Compress::spansUnCompress($body);
-    $span_handler->accept($spans);
-});
+class RabbitMQConsumer
+{
+    private $handler;
+
+    public function run()
+    {
+        $span_handler = new Server\Jobs\Trace();
+        $handler = isset($this->handler)
+            ? $this->handler
+            : function ($msg) use (&$span_handler) {
+            $body = $msg->body;
+            $spans = Common\Compress::spansUnCompress($body);
+            $span_handler->accept($spans);
+        };
+        Collector\TraceCollectorRabbitMQ::sub($handler);
+    }
+
+    /**
+     * @param $handler
+     * @return RabbitMQConsumer
+     */
+    public function handler($handler)
+    {
+        is_callable($handler) AND ($this->handler = $handler);
+        return $this;
+    }
+}
