@@ -302,7 +302,7 @@ class MysqlApi
         if ($serviceName == null) return null;
         return array(
             'serviceName' => $serviceName,
-            'ipv4' => $a['endpoint_ipv4'],
+            'ipv4' => is_long($a['endpoint_ipv4']) ? long2ip($a['endpoint_ipv4']) : $a['endpoint_ipv4'],
             'ipv6' => $a['endpoint_ipv6'],
             'port' => $a['endpoint_port'],
         );
