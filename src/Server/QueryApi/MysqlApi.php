@@ -69,7 +69,7 @@ class MysqlApi
      */
     public function traces(Server\QueryRequest $request, $traceId = null)
     {
-        if (!$request && $traceId) {
+        if (is_null($request) && is_null($traceId)) {
             return array();
         }
         $allSpans = array();

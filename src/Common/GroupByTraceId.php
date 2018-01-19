@@ -29,6 +29,18 @@ class GroupByTraceId
      */
     public static function apply($spans)
     {
-        return $spans;
+        $groupedByTraceId = array();
+        foreach ($spans as $span) {
+            $traceId = $span['traceId'];
+            if (!isset($groupedByTraceId[$traceId])) {
+                $groupedByTraceId[$traceId] = array();
+            }
+            $groupedByTraceId[$traceId][] = $span;
+        }
+        $result = array();
+        foreach ($groupedByTraceId as $sameTraceId) {
+            $result[] = $sameTraceId;
+        }
+        return $result;
     }
 }

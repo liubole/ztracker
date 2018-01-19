@@ -63,6 +63,18 @@ class Annotations extends Model
      */
     const table = "zipkin_annotations";
 
+    /**
+     * @return bool|mixed
+     */
+    public function save()
+    {
+        $cols = get_object_vars($this);
+        if (is_null($this->endpoint_ipv6)) {
+            unset($cols['endpoint_ipv6']);
+        }
+        return $this->insert($cols);
+    }
+
     public function __construct()
     {
         parent::__construct();

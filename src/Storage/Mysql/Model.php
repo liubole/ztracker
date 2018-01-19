@@ -108,16 +108,23 @@ class Model
      */
     public function save()
     {
+        return $this->insert(get_object_vars($this));
+    }
+
+    /**
+     * @param $cols
+     * @return bool|mixed
+     */
+    public function insert($cols)
+    {
         try {
+            $cols = isset($cols) ? $cols : get_object_vars($this);
             return $insert_id = self::$conn
                 ->insert(self::getTable())
-                ->cols(get_object_vars($this))
+                ->cols($cols)
                 ->query();
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             echo $e->getMessage() . PHP_EOL;
-            if ($e->getCode() == 23000) {
-                $this->replaceInto();
-            }
         }
         return false;
     }
