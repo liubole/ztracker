@@ -444,13 +444,15 @@ class Span
         }
         $span = new Span();
         foreach (array_intersect_key(get_object_vars($span), $vars) as $key => $no_use_val) {
-            if ($span->$key instanceof Decision) {
+            if ($key == 'decision') {
                 $span->$key = Decision::revertFromInt($vars[$key]);
-            } else if ($span->$key instanceof Endpoint) {
+            } else if ($key == 'localEndpoint' || $key == 'remoteEndpoint') {
                 $span->$key = Endpoint::revertFromArray($vars[$key]);
-            } else if ($span->$key == 'annotations') {
-                foreach ($span->$key as $k => $v) {
-                    $span->$key[$k] = Annotation::revertFromArray($v);
+            } else if ($key == 'annotations' || $key == 'binaryAnnotations') {
+                if (is_array($vars[$key])) {
+                    foreach ($vars[$key] as $k => $v) {
+                        $span->$key[$k] = Annotation::revertFromArray($v);
+                    }
                 }
             } else {
                 $span->$key = $vars[$key];

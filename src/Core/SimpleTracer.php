@@ -69,7 +69,7 @@ class SimpleTracer
     public function newSpan()
     {
         $span = GlobalTracer::spanBuilder()
-            ->traceId(Util::uuid())
+            ->traceId(Util::traceId())
             ->id(Util::spanId())
             ->name(Util::getServerApi())
             ->localEndpoint($this->localEndpoint());

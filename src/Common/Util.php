@@ -54,9 +54,20 @@ class Util
     /**
      * @return string
      */
-    public static function uuid()
+    public static function traceId()
     {
-        return self::random(32);
+        return base_convert(substr(self::random(16), 0, 15), 16, 10);
+//        return self::random(32);
+    }
+
+    /**
+     * @return string
+     */
+    public static function spanId()
+    {
+        $time = microtime();
+        return substr($time, 20, 1) . substr($time, 2, 6) . str_pad(getmypid(), 5, '0') . mt_rand(100, 999);
+//        return self::random(16);
     }
 
     /**
@@ -92,14 +103,6 @@ class Util
     public static function daysToMicros()
     {
         return 86400000000;
-    }
-
-    /**
-     * @return string
-     */
-    public static function spanId()
-    {
-        return self::random(16);
     }
 
     /**

@@ -137,7 +137,7 @@ class Trace extends Job
      */
     private function saveBinaryAnnotations(Core\Span &$span)
     {
-        if ($span->annotations) {
+        if ($span->binaryAnnotations) {
             foreach ($span->binaryAnnotations as $annotation) {
                 $entity = new Storage\Mysql\Annotations();
                 $endpoint = $annotation->endpoint ? $annotation->endpoint : $span->localEndpoint;

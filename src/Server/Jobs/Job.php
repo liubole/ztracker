@@ -62,7 +62,10 @@ class Job
      */
     public function catchSig()
     {
-        return pcntl_signal_dispatch();
+        if (function_exists('pcntl_signal_dispatch')) {
+            return pcntl_signal_dispatch();
+        }
+        return false;
     }
 
     /**

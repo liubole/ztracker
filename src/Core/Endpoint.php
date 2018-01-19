@@ -187,6 +187,9 @@ class Endpoint
      */
     public static function revertFromArray($vars)
     {
+        if (!isset($vars)) {
+            return null;
+        }
         return self::create($vars['serviceName'], $vars['ipv4'], $vars['ipv6'], $vars['port']);
     }
 

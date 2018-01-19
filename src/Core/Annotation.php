@@ -122,7 +122,10 @@ class Annotation
      */
     public static function revertFromArray($vars)
     {
-        if (is_array($vars['endpoint'])) {
+        if (!isset($vars)) {
+            return null;
+        }
+        if (isset($vars['endpoint']) && is_array($vars['endpoint'])) {
             $vars['endpoint'] = Endpoint::revertFromArray($vars['endpoint']);
         }
         return self::create($vars['timestamp'], $vars['value'], $vars['endpoint']);

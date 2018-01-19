@@ -108,10 +108,18 @@ class Model
      */
     public function save()
     {
-        return $insert_id = self::$conn
-            ->insert(self::getTable())
-            ->cols(get_object_vars($this))
-            ->query();
+        try {
+            return $insert_id = self::$conn
+                ->insert(self::getTable())
+                ->cols(get_object_vars($this))
+                ->query();
+        } catch (\Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+            if ($e->getCode() == 23000) {
+                $this->replaceInto();
+            }
+        }
+        return false;
     }
 
     /**
