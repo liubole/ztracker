@@ -501,7 +501,7 @@ class Span
             $vars['localEndpoint'] = Endpoint::shorten($vars['localEndpoint']);
         }
         if (isset($vars['remoteEndpoint'])) {
-            $vars['remoteEndpoint'] = Endpoint::shorten($vars['localEndpoint']);
+            $vars['remoteEndpoint'] = Endpoint::shorten($vars['remoteEndpoint']);
         }
         if (isset($vars['annotations'])) {
             foreach ($vars['annotations'] as $k => $v) {
@@ -510,7 +510,7 @@ class Span
         }
         if (isset($vars['binaryAnnotations'])) {
             foreach ($vars['binaryAnnotations'] as $k => $v) {
-                $vars['binaryAnnotations'][$k] = Annotation::shorten($v);
+                $vars['binaryAnnotations'][$k] = BinaryAnnotation::shorten($v);
             }
         }
         return Common\Compress::map($vars, Common\Compress::SPAN_MAP);
