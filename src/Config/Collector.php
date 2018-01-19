@@ -30,9 +30,4 @@ class Collector
      * @var string
      */
     public static $reporter = Collector::reporterRabbitMQ;
-    /**
-     * Report format: 'json' or 'serialize'
-     * @var string
-     */
-    public static $reportType = Collector::json;
 }

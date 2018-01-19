@@ -6,7 +6,7 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Common;
 
 class BinaryAnnotation
 {
@@ -42,6 +42,14 @@ class BinaryAnnotation
      */
     public $endpoint;
 
+    public function __construct($key, array $value, $type, Endpoint $endpoint)
+    {
+        $this->key = Common\Util::checkNotNull($key, "key");
+        $this->value = Common\Util::checkNotNull($value, "value");
+        $this->type = Common\Util::checkNotNull($type, "type");
+        $this->endpoint = $endpoint;
+    }
+
     /**
      * Special-cased form supporting {@link Constants#CLIENT_ADDR} and
      * {@link Constants#SERVER_ADDR}.
@@ -52,7 +60,7 @@ class BinaryAnnotation
      */
     public static function address($key, Endpoint $endpoint)
     {
-        return new BinaryAnnotation($key, array(), BinaryAnnotationType::BOOL, Util::checkNotNull($endpoint, "endpoint"));
+        return new BinaryAnnotation($key, array(), BinaryAnnotationType::BOOL, Common\Util::checkNotNull($endpoint, "endpoint"));
     }
 
     /**
@@ -93,11 +101,44 @@ class BinaryAnnotation
         return spl_object_hash($this);
     }
 
-    public function __construct($key, array $value, $type, Endpoint $endpoint)
+    /**
+     * @return array
+     */
+    public function convertToArray()
     {
-        $this->key = Util::checkNotNull($key, "key");
-        $this->value = Util::checkNotNull($value, "value");
-        $this->type = Util::checkNotNull($type, "type");
-        $this->endpoint = $endpoint;
+        $array = array();
+        foreach (get_object_vars($this) as $key => $val) {
+            if ($val instanceof Endpoint) {
+                $array[$key] = $val->convertToArray();
+            } else {
+                $array[$key] = $val;
+            }
+        }
+        return $array;
+    }
+
+    /**
+     * @param $vars
+     * @return array
+     */
+    public static function shorten($vars)
+    {
+        if (!isset($vars)) return null;
+        if (isset($vars['endpoint'])) {
+            $vars['endpoint'] = Endpoint::shorten($vars['endpoint']);
+        }
+        return Common\Compress::map($vars, Common\Compress::BINARYANNOTATION_MAP);
+    }
+
+    /**
+     * @param $shorten
+     * @return array
+     */
+    public static function normalize($shorten)
+    {
+        if (isset($shorten['endpoint'])) {
+            $shorten['endpoint'] = Endpoint::normalize($shorten['endpoint']);
+        }
+        return Common\Compress::map($shorten, Common\Compress::MAP_BINARYANNOTATION);
     }
 }

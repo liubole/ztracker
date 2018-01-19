@@ -197,4 +197,23 @@ class Endpoint
     {
         return get_object_vars($this);
     }
+
+    /**
+     * @param $vars
+     * @return array
+     */
+    public static function shorten($vars)
+    {
+        if (!isset($vars)) return null;
+        return Common\Compress::map($vars, Common\Compress::ENDPOINT_MAP);
+    }
+
+    /**
+     * @param $shorten
+     * @return array
+     */
+    public static function normalize($shorten)
+    {
+        return Common\Compress::map($shorten, Common\Compress::MAP_ENDPOINT);
+    }
 }

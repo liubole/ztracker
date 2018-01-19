@@ -477,6 +477,8 @@ class Span
                 foreach ($val as $k => &$v) {
                     if ($v instanceof Annotation) {
                         $array[$key][$k] = $v->convertToArray();
+                    } else if ($v instanceof BinaryAnnotation) {
+                        $array[$key][$k] = $v->convertToArray();
                     } else {
                         $array[$key][$k] = $v;
                     }
@@ -486,5 +488,56 @@ class Span
             }
         }
         return $array;
+    }
+
+    /**
+     * @param $vars
+     * @return array
+     */
+    public static function shorten($vars)
+    {
+        if (!isset($vars)) return null;
+        if (isset($vars['localEndpoint'])) {
+            $vars['localEndpoint'] = Endpoint::shorten($vars['localEndpoint']);
+        }
+        if (isset($vars['remoteEndpoint'])) {
+            $vars['remoteEndpoint'] = Endpoint::shorten($vars['localEndpoint']);
+        }
+        if (isset($vars['annotations'])) {
+            foreach ($vars['annotations'] as $k => $v) {
+                $vars['annotations'][$k] = Annotation::shorten($v);
+            }
+        }
+        if (isset($vars['binaryAnnotations'])) {
+            foreach ($vars['binaryAnnotations'] as $k => $v) {
+                $vars['binaryAnnotations'][$k] = Annotation::shorten($v);
+            }
+        }
+        return Common\Compress::map($vars, Common\Compress::SPAN_MAP);
+    }
+
+    /**
+     * @param $shorten
+     * @return array
+     */
+    public static function normalize($shorten)
+    {
+        if (isset($shorten['localEndpoint'])) {
+            $shorten['localEndpoint'] = Endpoint::normalize($shorten['localEndpoint']);
+        }
+        if (isset($shorten['remoteEndpoint'])) {
+            $shorten['remoteEndpoint'] = Endpoint::normalize($shorten['localEndpoint']);
+        }
+        if (isset($shorten['annotations'])) {
+            foreach ($shorten['annotations'] as $k => $v) {
+                $shorten['annotations'][$k] = Annotation::normalize($v);
+            }
+        }
+        if (isset($shorten['binaryAnnotations'])) {
+            foreach ($shorten['binaryAnnotations'] as $k => $v) {
+                $shorten['binaryAnnotations'][$k] = BinaryAnnotation::normalize($v);
+            }
+        }
+        return Common\Compress::map($shorten, Common\Compress::MAP_SPAN);
     }
 }

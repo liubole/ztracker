@@ -6,6 +6,8 @@
  */
 namespace Tricolor\ZTracker\Core;
 
+use Tricolor\ZTracker\Common;
+
 class Annotation
 {
     /**
@@ -131,6 +133,39 @@ class Annotation
      */
     public function convertToArray()
     {
-        return get_object_vars($this);
+        $array = array();
+        foreach (get_object_vars($this) as $key => $val) {
+            if ($val instanceof Endpoint) {
+                $array[$key] = $val->convertToArray();
+            } else {
+                $array[$key] = $val;
+            }
+        }
+        return $array;
+    }
+
+    /**
+     * @param $vars
+     * @return array
+     */
+    public static function shorten($vars)
+    {
+        if (!isset($vars)) return null;
+        if (isset($vars['endpoint'])) {
+            $vars['endpoint'] = Endpoint::shorten($vars['endpoint']);
+        }
+        return Common\Compress::map($vars, Common\Compress::ANNOTATION_MAP);
+    }
+
+    /**
+     * @param $shorten
+     * @return array
+     */
+    public static function normalize($shorten)
+    {
+        if (isset($shorten['endpoint'])) {
+            $shorten['endpoint'] = Endpoint::normalize($shorten['endpoint']);
+        }
+        return Common\Compress::map($shorten, Common\Compress::MAP_ANNOTATION);
     }
 }

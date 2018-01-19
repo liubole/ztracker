@@ -7,6 +7,7 @@
 namespace Tricolor\ZTracker\Core;
 
 use Tricolor\ZTracker\Config;
+use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Collector;
 
 class Reporter
@@ -50,7 +51,7 @@ class Reporter
     private static function reportSpanByRabbitMQ(&$spans)
     {
         if ($spans && Collector\TraceCollectorRabbitMQ::connect()) {
-            $message = self::encode($spans, Config\Collector::$reportType, true);
+            $message = Common\Compress::spansCompress($spans);
             Collector\TraceCollectorRabbitMQ::pub($message);
             return true;
         }
@@ -64,7 +65,7 @@ class Reporter
     private static function reportSpanToFile(&$spans)
     {
         if ($spans && Collector\TraceCollectorFile::ready()) {
-            $message = self::encode($spans, Config\Collector::$reportType);
+            $message = Common\Compress::spansCompress($spans, false);
             return Collector\TraceCollectorFile::write($message);
         }
         return false;
