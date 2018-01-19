@@ -152,6 +152,6 @@ class TraceCollectorRabbitMQ
      */
     private static function getConfig()
     {
-        return Config\TraceCollector::get();
+        return Config\TraceCollector::getRabbitConfig();
     }
 }
