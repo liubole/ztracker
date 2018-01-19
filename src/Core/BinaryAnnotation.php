@@ -136,8 +136,9 @@ class BinaryAnnotation
      */
     public static function normalize($shorten)
     {
-        if (isset($shorten['endpoint'])) {
-            $shorten['endpoint'] = Endpoint::normalize($shorten['endpoint']);
+        $map = Common\Compress::BINARYANNOTATION_MAP;
+        if (isset($shorten[$map['endpoint']])) {
+            $shorten[$map['endpoint']] = Endpoint::normalize($shorten[$map['endpoint']]);
         }
         return Common\Compress::map($shorten, Common\Compress::MAP_BINARYANNOTATION);
     }
