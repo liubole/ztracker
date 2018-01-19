@@ -66,20 +66,20 @@ class Trace extends Job
         }
         if ($span->kind == Core\SpanKind\Client) {
             $span->addAnnotation(Core\Annotation::create(
-                Core\Constants::CLIENT_RECV, $span->timestamp, $span->localEndpoint));
+                $span->timestamp, Core\Constants::CLIENT_RECV, $span->localEndpoint));
 	        $span->addAnnotation(Core\Annotation::create(
-                Core\Constants::CLIENT_SEND, Common\Util::endTs($span->timestamp, $span->duration), $span->localEndpoint));
+                Common\Util::endTs($span->timestamp, $span->duration), Core\Constants::CLIENT_SEND, $span->localEndpoint));
         } elseif ($span->kind == Core\SpanKind\Server) {
             $span->addAnnotation(Core\Annotation::create(
-                Core\Constants::SERVER_RECV, $span->timestamp, $span->localEndpoint));
+                $span->timestamp, Core\Constants::SERVER_RECV, $span->localEndpoint));
             $span->addAnnotation(Core\Annotation::create(
-                Core\Constants::SERVER_SEND, Common\Util::endTs($span->timestamp, $span->duration), $span->localEndpoint));
+                Common\Util::endTs($span->timestamp, $span->duration), Core\Constants::SERVER_SEND, $span->localEndpoint));
         } elseif ($span->kind == Core\SpanKind\Producer) {
             $span->addAnnotation(Core\Annotation::create(
-                Core\Constants::MESSAGE_SEND, $span->timestamp, $span->localEndpoint));
+                $span->timestamp, Core\Constants::MESSAGE_SEND, $span->localEndpoint));
         } elseif ($span->kind == Core\SpanKind\Consumer) {
             $span->addAnnotation(Core\Annotation::create(
-                Core\Constants::MESSAGE_RECV, $span->timestamp, $span->localEndpoint));
+                $span->timestamp, Core\Constants::MESSAGE_RECV, $span->localEndpoint));
         }
     }
 

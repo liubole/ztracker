@@ -67,8 +67,11 @@ class MysqlApi
      * @param $traceId
      * @return mixed
      */
-    public function traces(Server\QueryRequest $request, $traceId)
+    public function traces(Server\QueryRequest $request, $traceId = null)
     {
+        if (!$request && $traceId) {
+            return array();
+        }
         $allSpans = array();
         try {
             $spanFields = "`trace_id`,`id`,`name`,`parent_id`,`debug`,`start_ts`,`duration`";

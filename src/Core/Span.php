@@ -350,12 +350,9 @@ class Span
      */
     public function addAnnotation(Annotation $annotation)
     {
-        is_array($this->annotations) OR ($this->annotations = array());
-        $this->annotations[] = $annotation;
-        foreach ($this->annotations as $o) {
-            if ($annotation->equals($o)) {
-                return $this;
-            }
+        isset($this->annotations) OR ($this->annotations = array());
+        if ($annotation instanceof Annotation) {
+            $this->annotations[] = $annotation;
         }
         return $this;
     }
@@ -367,13 +364,10 @@ class Span
      */
     public function addBinaryAnnotation(BinaryAnnotation $binaryAnnotation)
     {
-        is_array($this->binaryAnnotations) OR ($this->binaryAnnotations = array());
-        foreach ($this->binaryAnnotations as $o) {
-            if ($binaryAnnotation->equals($o)) {
-                return $this;
-            }
+        isset($this->binaryAnnotations) OR ($this->binaryAnnotations = array());
+        if ($binaryAnnotation instanceof BinaryAnnotation) {
+            $this->binaryAnnotations[] = $binaryAnnotation;
         }
-        $this->binaryAnnotations[] = $binaryAnnotation;
         return $this;
     }
 

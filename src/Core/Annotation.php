@@ -32,8 +32,11 @@ class Annotation
      */
     public $endpoint;
 
-    public function __construct()
+    public function __construct($timestamp, $value, Endpoint $endpoint)
     {
+        $this->timestamp($timestamp);
+        $this->value($value);
+        $this->endpoint($endpoint);
     }
 
     /**
