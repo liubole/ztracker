@@ -42,7 +42,7 @@ class BinaryAnnotation
      */
     public $endpoint;
 
-    public function __construct($key, array $value, $type, Endpoint $endpoint)
+    public function __construct($key, $value, $type, Endpoint $endpoint)
     {
         $this->key = Common\Util::checkNotNull($key, "key");
         $this->value = Common\Util::checkNotNull($value, "value");
