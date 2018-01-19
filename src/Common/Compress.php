@@ -30,9 +30,9 @@ class Compress
 
     const ENDPOINT_MAP = array(
         'serviceName' => 'a',
-        'ipv4' => 'b',
-        'ipv6' => 'c',
-        'port' => 'd',
+        'port' => 'b',
+        'ipv4' => 'c',
+        'ipv6' => 'd',
     );
 
     const ANNOTATION_MAP = array(
@@ -68,9 +68,9 @@ class Compress
 
     const MAP_ENDPOINT = array(
         'a' => 'serviceName',
-        'b' => 'ipv4',
-        'c' => 'ipv6',
-        'd' => 'port',
+        'b' => 'port',
+        'c' => 'ipv4',
+        'd' => 'ipv6',
     );
 
     const MAP_ANNOTATION = array(
