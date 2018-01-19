@@ -92,8 +92,8 @@ class QueryRequest
 
     public function __construct($serviceName, $spanName, $annotations, $binaryAnnotations, $minDuration, $maxDuration, $endTs, $lookback, $limit)
     {
-        Common\Util::checkArgument($serviceName == null || !$serviceName . isEmpty(), "serviceName was empty");
-        Common\Util::checkArgument($spanName == null || !$spanName . isEmpty(), "spanName was empty");
+        Common\Util::checkArgument($serviceName == null || !empty($serviceName), "serviceName was empty");
+        Common\Util::checkArgument($spanName == null || !empty($spanName), "spanName was empty");
         Common\Util::checkArgument($endTs > 0, "endTs should be positive, in epoch microseconds: was %d", $endTs);
         Common\Util::checkArgument($limit > 0, "limit should be positive: was %d", $limit);
         $this->serviceName = $serviceName != null ? strtolower($serviceName) : null;
