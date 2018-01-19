@@ -513,7 +513,7 @@ class Span
                 $vars['binaryAnnotations'][$k] = Annotation::shorten($v);
             }
         }
-        return Common\Compress::map($vars, $map);
+        return Common\Compress::map($vars, Common\Compress::SPAN_MAP);
     }
 
     /**
