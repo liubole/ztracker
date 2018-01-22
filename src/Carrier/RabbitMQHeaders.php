@@ -117,7 +117,7 @@ class RabbitMQHeaders implements Base
             ->traceId($span['TraceId'])
             ->id($span['SpanId'])
             ->parentId($span['ParentId'])
-            ->decision($span['Decision']);
+            ->decision(Core\GlobalTracer::decisionBuilder($span['Decision']));
         $this->context = new Core\Context();
         foreach ($context as $k => $v) { $this->context->set($k, $v);}
         return $this;
