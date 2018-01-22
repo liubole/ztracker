@@ -26,7 +26,7 @@ class HttpHeaders implements Base
      */
     public function pipe(&$headers)
     {
-        $this->headers = $headers;
+        $this->headers = &$headers;
         return $this;
     }
 
