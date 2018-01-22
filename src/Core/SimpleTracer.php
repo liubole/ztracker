@@ -9,6 +9,7 @@ namespace Tricolor\ZTracker\Core;
 use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Carrier;
 use Tricolor\ZTracker\Config;
+use Tricolor\ZTracker\Exception\NullPointerException;
 
 class SimpleTracer
 {
@@ -20,6 +21,10 @@ class SimpleTracer
      * @var Span
      */
     private $span;
+    /**
+     * @var Span
+     */
+    private $remoteSpan;
     /**
      * @var Endpoint
      */
@@ -54,14 +59,15 @@ class SimpleTracer
     public function newChildSpan()
     {
         $span = $this->currentSpan();
-        $span = GlobalTracer::spanBuilder()
+        $child = GlobalTracer::spanBuilder()
             ->traceId($span->traceId)
             ->id(Common\Util::spanId())
             ->parentId($span->id)
             ->localEndpoint($this->localEndpoint())
             ->decision($span->decision);
-        $this->joinSpan($span);
-        return $span;
+        $this->remoteSpan($child);
+        $this->joinSpan($child);
+        return $child;
     }
 
     /**
@@ -96,6 +102,22 @@ class SimpleTracer
             $this->span = $span;
         }
         return $this->span;
+    }
+
+    /**
+     * @param Span|null $span
+     * @return Span
+     * @throws NullPointerException
+     */
+    public function remoteSpan(Span $span = null)
+    {
+        if ($span) {
+            $this->remoteSpan = $span;
+        }
+        if (!$this->remoteSpan) {
+            throw new NullPointerException('Remote span cannot be null!');
+        }
+        return $this->remoteSpan;
     }
 
     /**
@@ -149,22 +171,29 @@ class SimpleTracer
         return $this;
     }
 
+    /**
+     * @param $pipe
+     * @return $this
+     */
     public function inject(&$pipe)
     {
         $this->carrier
             ->pipe($pipe)
-            ->span($this->currentSpan())
+            ->span($this->remoteSpan())
             ->context($this->currentContext())
             ->inject();
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function extract()
     {
         $this->carrier->pipe($_SERVER)->extract();
         $content = $this->carrier->getContext();
         $span = $this->carrier->getSpan();
-        
+
         $span->localEndpoint($this->localEndpoint());
         $this->currentContext($content);
         $this->currentSpan($span);
