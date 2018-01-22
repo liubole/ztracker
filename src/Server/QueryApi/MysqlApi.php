@@ -92,7 +92,7 @@ class MysqlApi
                     'name' => $row['name'],
                     'id' => $row['id'],
                     'parentId' => $row['parent_id'],
-                    'timestamp' => $row['start_ts'],
+                    'timestamp' => $this->micro2Sec($row['start_ts']),
                     'duration' => $row['duration'],
                     'debug' => $row['debug'],
                 );
@@ -119,7 +119,7 @@ class MysqlApi
                         $endpoint = $this->endpoint($a);
                         if ($a['a_type'] == -1) {
                             $span['annotations'][] = array(
-                                'timestamp' => $a['a_timestamp'],
+                                'timestamp' => $this->micro2Sec($a['a_timestamp']),
                                 'value' => $a['a_key'],
                                 'endpoint' => $endpoint,
                             );
@@ -306,5 +306,14 @@ class MysqlApi
             'ipv6' => $a['endpoint_ipv6'],
             'port' => $a['endpoint_port'],
         );
+    }
+
+    /**
+     * @param $micro_sec
+     * @return string
+     */
+    private function micro2Sec($micro_sec)
+    {
+        return bcdiv($micro_sec, 1000000, 0);
     }
 }
