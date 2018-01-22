@@ -186,11 +186,15 @@ class SimpleTracer
     }
 
     /**
+     * @param $pipe
      * @return $this
      */
-    public function extract()
+    public function extract(&$pipe = null)
     {
-        $this->carrier->pipe($_SERVER)->extract();
+        if (!isset($pipe) && $this->carrier instanceof Carrier\HttpHeaders) {
+            $pipe = Common\Util::getHeaders();
+        }
+        $this->carrier->pipe($pipe)->extract();
         $content = $this->carrier->getContext();
         $span = $this->carrier->getSpan();
 
