@@ -23,6 +23,7 @@ class TraceCollectorRabbitMQ
         try {
             self::getConn();
         } catch (\Exception $e) {
+            // todo errorlog
             return false;
         }
         return !!self::$conn;
