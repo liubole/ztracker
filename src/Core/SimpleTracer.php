@@ -198,8 +198,9 @@ class SimpleTracer
             $associate = $this->currentSpan()
                 ? array(
                     'traceId' => $this->currentSpan()->traceId,
-                    'spanId' => $this->currentSpan()->id,)
-                : array();
+                    'spanId' => $this->currentSpan()->id,
+                    'timestamp' => Common\Util::currentInHuman($this->currentSpan()->timestamp),)
+                : array('timestamp' => Common\Util::currentInHuman());
             foreach (array_keys($associate) as $key) {
                 if (isset($this->logs[$key])) {
                     $this->logs[$key . '_' . Common\Util::random(6)] = $this->logs[$key];

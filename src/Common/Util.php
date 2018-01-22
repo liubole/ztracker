@@ -37,6 +37,16 @@ class Util
     }
 
     /**
+     * @param null $current
+     * @return string
+     */
+    public static function currentInHuman($current = null)
+    {
+        $current = isset($current) ? $current : self::current();
+        return date('Y-m-d H:i:s', substr($current, 0, 10)) . '.' . substr($current, 10);
+    }
+
+    /**
      * @param $start
      * @param $end
      * @return string
