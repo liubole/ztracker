@@ -25,7 +25,7 @@ function apiInit()
     $tracer = GlobalTracer::tracer();
     $tracer->injector(CarrierType\HttpHeader)->extract();
     $tracer->currentSpan()
-        ->name(Util::getServerName())
+        ->name(Tricolor\ZTracker\Common\Util::getServerApi())
         ->shared(true)
         ->kind(SpanKind\Server);
 
