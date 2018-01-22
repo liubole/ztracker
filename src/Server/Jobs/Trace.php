@@ -31,7 +31,10 @@ class Trace extends Job
         foreach ($span_array as $arr) {
             $span = Core\Span::revertFromArray($arr);
             if (!$span->decision->sampled()) {
+                $this->log("    SPAN SAMPLED => FALSE");
                 continue;
+            } else {
+                $this->log("    SPAN SAMPLED => TRUE");
             }
             $this->pretreatment($span);
             if ($span->shared) {

@@ -18,6 +18,9 @@ class RabbitMQHeaders implements Base
      */
     private $msg;
     private $context;
+    /**
+     * @var Core\Builder\SpanBuilder
+     */
     private $span;
 
     public function __construct()
@@ -26,7 +29,7 @@ class RabbitMQHeaders implements Base
 
     /**
      * @param $msg
-     * @return RabbitMQHeaders
+     * @return null|RabbitMQHeaders
      */
     public function pipe(&$msg)
     {
@@ -39,9 +42,11 @@ class RabbitMQHeaders implements Base
      * @param Core\Span $span
      * @return RabbitMQHeaders
      */
-    public function span(Core\Span $span)
+    public function span(Core\Span &$span)
     {
-        $this->span = $span;
+        if (!is_null($span)) {
+            $this->span = &$span;
+        }
         return $this;
     }
 
@@ -49,9 +54,9 @@ class RabbitMQHeaders implements Base
      * @param $context Core\Context
      * @return RabbitMQHeaders
      */
-    public function context(Core\Context $context)
+    public function context(Core\Context &$context)
     {
-        $this->context = $context;
+        $this->context = &$context;
         return $this;
     }
 
@@ -60,21 +65,26 @@ class RabbitMQHeaders implements Base
      */
     public function inject()
     {
+        $appends = array();
         // span
-        $span = array();
-        $prefix = self::$prefix . "S-";
-        $span[$prefix . "TraceId"] = $this->span->traceId;
-        $span[$prefix . "SpanId"] = $this->span->id;
-        $span[$prefix . "ParentId"] = $this->span->parentId;
-        $span[$prefix . "Decision"] = $this->span->decision->getValue();
-
-        // context
-        $context = array();
-        $prefix = self::$prefix . "C-";
-        foreach(get_object_vars($this->context) as $key => $val) {
-            $context[$prefix . $key] =  $val;
+        if (isset($this->span)) {
+            $span = array();
+            $prefix = self::$prefix . "S-";
+            $span[$prefix . "TraceId"] = $this->span->traceId;
+            $span[$prefix . "SpanId"] = $this->span->id;
+            $span[$prefix . "ParentId"] = $this->span->parentId;
+            $span[$prefix . "Decision"] = $this->span->decision->getValue();
+            $appends = array_merge($appends, $span);
         }
-        $appends = array_merge($span, $context);
+        // context
+        if (isset($this->context)) {
+            $context = array();
+            $prefix = self::$prefix . "C-";
+            foreach (get_object_vars($this->context) as $key => $val) {
+                $context[$prefix . $key] = $val;
+            }
+            $appends = array_merge($appends, $context);
+        }
 
         // inject
         try {
@@ -91,9 +101,11 @@ class RabbitMQHeaders implements Base
     }
 
     /**
-     * @return RabbitMQHeaders
+     * @param Core\Builder\SpanBuilder $span
+     * @param Core\Context|null $context
+     * @return null|RabbitMQHeaders
      */
-    public function extract()
+    public function extract(Core\Builder\SpanBuilder &$span = null, Core\Context &$context = null)
     {
         try {
             $hdr = $this->msg->get('application_headers');
@@ -105,21 +117,33 @@ class RabbitMQHeaders implements Base
             return $this;
         }
 
-        $context = $span = array();
+        $ctx_array = $span_array = array();
         foreach ($headers as $key => $val) {
             if (Common\Util::startsWith($key, $prefix = self::$prefix . "C-")) {
-                $context[substr($key, strlen($prefix))] = $val;
+                $ctx_array[substr($key, strlen($prefix))] = $val;
             } else if (Common\Util::startsWith($key, $prefix = self::$prefix . "S-")) {
-                $span[substr($key, strlen($prefix))] = $val;
+                $span_array[substr($key, strlen($prefix))] = $val;
             }
         }
-        $this->span = Core\GlobalTracer::spanBuilder()
-            ->traceId($span['TraceId'])
-            ->id($span['SpanId'])
-            ->parentId($span['ParentId'])
-            ->decision($span['Decision']);
-        $this->context = new Core\Context();
-        foreach ($context as $k => $v) { $this->context->set($k, $v);}
+        $completion = isset($span_array['TraceId']) && isset($span_array['SpanId']);
+        if ($completion) {
+            $builder = Core\GlobalTracer::spanBuilder()
+                ->traceId($span_array['TraceId'])
+                ->id($span_array['SpanId'])
+                ->parentId($span_array['ParentId'])
+                ->decision($span_array['Decision']);
+            if (isset($span)) {
+                $span = $builder;
+            }
+            $this->span($builder->build());
+        }
+        $ctx = new Core\Context();
+        foreach ($ctx_array as $k => $v) $ctx->set($k, $v);
+        $this->context($ctx);
+        if (isset($context)) {
+            $context = $this->context;
+        }
+
         return $this;
     }
 
@@ -132,7 +156,7 @@ class RabbitMQHeaders implements Base
     }
 
     /**
-     * @return Core\Span
+     * @return Core\Builder\SpanBuilder
      */
     public function getSpan()
     {

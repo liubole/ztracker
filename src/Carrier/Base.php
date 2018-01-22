@@ -8,5 +8,9 @@ namespace Tricolor\ZTracker\Carrier;
 
 Interface Base
 {
+    /**
+     * @param $var
+     * @return null|HttpHeaders|RabbitMQHeaders|Base
+     */
     public function pipe(&$var);
 }

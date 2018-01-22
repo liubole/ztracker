@@ -9,6 +9,8 @@ namespace Tricolor\ZTracker\Core;
 use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Carrier;
 use Tricolor\ZTracker\Config;
+use Tricolor\ZTracker\Core;
+use Tricolor\ZTracker\Exception\NullPointerException;
 
 class SimpleTracer
 {
@@ -20,6 +22,10 @@ class SimpleTracer
      * @var Span
      */
     private $span;
+    /**
+     * @var Span
+     */
+    private $remoteSpan;
     /**
      * @var Endpoint
      */
@@ -38,7 +44,7 @@ class SimpleTracer
     private $logs;
 
     /**
-     * @var Carrier\HttpHeaders|Carrier\RabbitMQHeaders
+     * @var null|Carrier\HttpHeaders
      */
     private $carrier;
 
@@ -49,23 +55,24 @@ class SimpleTracer
     }
 
     /**
-     * @return Span
+     * @return Core\Builder\SpanBuilder
      */
     public function newChildSpan()
     {
         $span = $this->currentSpan();
-        $span = GlobalTracer::spanBuilder()
+        $child = GlobalTracer::spanBuilder()
             ->traceId($span->traceId)
             ->id(Common\Util::spanId())
             ->parentId($span->id)
             ->localEndpoint($this->localEndpoint())
             ->decision($span->decision);
-        $this->joinSpan($span);
-        return $span;
+        $this->remoteSpan($child);
+        $this->joinSpan($child);
+        return $child;
     }
 
     /**
-     * @return Span
+     * @return Core\Builder\SpanBuilder
      */
     public function newSpan()
     {
@@ -87,23 +94,41 @@ class SimpleTracer
     }
 
     /**
-     * @param Span|null $span
+     * @param Core\Builder\SpanBuilder|null $span
      * @return Span
      */
-    public function currentSpan(Span $span = null)
+    public function currentSpan(Core\Builder\SpanBuilder $span = null)
     {
-        if ($span) {
+        if (func_num_args() > 0) {
             $this->span = $span;
         }
         return $this->span;
     }
 
     /**
-     * @param Span $span
+     * @param Span|null $span
+     * @return Span
+     * @throws NullPointerException
      */
-    public function joinSpan(Span &$span)
+    public function remoteSpan(Span $span = null)
     {
-        $this->reportSpans[] = $span;
+        if ($span) {
+            $this->remoteSpan = $span;
+        }
+        if (!$this->remoteSpan) {
+            throw new NullPointerException('Remote span cannot be null!');
+        }
+        return $this->remoteSpan;
+    }
+
+    /**
+     * @param Core\Builder\SpanBuilder $span
+     */
+    public function joinSpan(Core\Builder\SpanBuilder &$span)
+    {
+        if (isset($span)) {
+            $this->reportSpans[] = $span;
+        }
     }
 
     /**
@@ -123,7 +148,7 @@ class SimpleTracer
      */
     public function currentContext(Context $context = null)
     {
-        if ($context) {
+        if (func_num_args() > 0) {
             $this->context = $context;
         }
         if (!$this->context) {
@@ -134,7 +159,7 @@ class SimpleTracer
 
     /**
      * @param $type
-     * @return SimpleTracer
+     * @return null|Carrier\RabbitMQHeaders
      */
     public function injector($type)
     {
@@ -145,28 +170,36 @@ class SimpleTracer
             case Carrier\CarrierType\RabbitMQHeader:
                 $this->carrier = new Carrier\RabbitMQHeaders();
                 break;
+            default:
+                return null;
         }
-        return $this;
+        return $this->carrier;
     }
 
-    public function inject(&$pipe)
+    /**
+     * @param $type
+     * @param $pipe
+     * @return $this
+     */
+    public function inject($type, &$pipe)
     {
-        $this->carrier
+        $this->injector($type)
             ->pipe($pipe)
-            ->span($this->currentSpan())
+            ->span($this->remoteSpan())
             ->context($this->currentContext())
             ->inject();
         return $this;
     }
 
-    public function extract()
+    public function extract($type)
     {
-        $this->carrier->pipe($_SERVER)->extract();
-        $content = $this->carrier->getContext();
-        $span = $this->carrier->getSpan();
-        
-        $span->localEndpoint($this->localEndpoint());
-        $this->currentContext($content);
+        $this->injector($type)
+            ->pipe($_SERVER)
+            ->extract($span, $context);
+        if (isset($span) && ($span instanceof Core\Span)) {
+            $span->localEndpoint($this->localEndpoint());
+        }
+        $this->currentContext($context);
         $this->currentSpan($span);
         $this->joinSpan($span);
         return $this;
@@ -178,8 +211,10 @@ class SimpleTracer
             return;
         }
         foreach ($this->reportSpans as &$span) {
-            if ($span instanceof Span)
-                $span = $span->convertToArray();
+            if ($span instanceof Core\Builder\SpanBuilder) {
+                if (!$span->traceId || !$span->id) continue;
+                $span = $span->build()->convertToArray();
+            }
         }
         $reportOn = $this->currentSpan()->decision
             ? $this->currentSpan()->decision->reportOn()

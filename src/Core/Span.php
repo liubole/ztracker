@@ -6,6 +6,7 @@
  */
 namespace Tricolor\ZTracker\Core;
 
+use Tricolor\ZTracker\Core;
 use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Exception\NullPointerException;
 
@@ -385,7 +386,6 @@ class Span
      */
     public function equals($o)
     {
-
         if ($o instanceof Span) {
             return $o == $this;
         }
@@ -536,5 +536,30 @@ class Span
             }
         }
         return Common\Compress::map($shorten, Common\Compress::MAP_SPAN);
+    }
+
+    /**
+     * @param Builder\SpanBuilder $builder
+     * @return Core\Span
+     */
+    public static function create(Core\Builder\SpanBuilder $builder)
+    {
+        $span = new Core\Span();
+        $span->traceId = $builder->traceId;
+        $span->name = $builder->name;
+        $span->id = $builder->id;
+        $span->parentId = $builder->parentId;
+        $span->decision = $builder->decision;
+        $span->localEndpoint = $builder->localEndpoint;
+        $span->kind = $builder->kind;
+        $span->shared = $builder->shared;
+        $span->remoteEndpoint = $builder->remoteEndpoint;
+        $span->annotations = $builder->annotations;
+        $span->binaryAnnotations = $builder->binaryAnnotations;
+        $span->timestamp = $builder->timestamp;
+        $span->duration = $builder->duration;
+        $span->tags = $builder->tags;
+        $span->debug = $builder->debug;
+        return $span;
     }
 }

@@ -64,7 +64,13 @@ function clientDoRpc()
                 ->ip('127.0.0.1')
                 ->port('1234')
         )*/;
-    $tracer->injector(CarrierType\HttpHeader)->inject($headers);
+    $tracer->inject(CarrierType\HttpHeader, $headers);
+    // or:
+    $tracer->injector(CarrierType\HttpHeader)
+        ->pipe($headers)
+        ->span($tracer->remoteSpan())
+        ->context($tracer->currentContext())
+        ->inject();
     {
         // real rpc
     }
