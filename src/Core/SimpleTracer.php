@@ -6,8 +6,9 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Carrier;
+use Tricolor\ZTracker\Config;
 
 class SimpleTracer
 {
@@ -55,7 +56,7 @@ class SimpleTracer
         $span = $this->currentSpan();
         $span = GlobalTracer::spanBuilder()
             ->traceId($span->traceId)
-            ->id(Util::spanId())
+            ->id(Common\Util::spanId())
             ->parentId($span->id)
             ->localEndpoint($this->localEndpoint())
             ->decision($span->decision);
@@ -68,10 +69,17 @@ class SimpleTracer
      */
     public function newSpan()
     {
+        // sample or not
+        $decision = GlobalTracer::decisionBuilder();
+        $sampled = Common\Util::sampleOrNot(Config\TraceEnv::$sampleRate)
+            ? Config\TraceEnv::SAMPLED
+            : Config\TraceEnv::NOT_SAMPLED;
+        $decision->switchOver($sampled);
         $span = GlobalTracer::spanBuilder()
-            ->traceId(Util::traceId())
-            ->id(Util::spanId())
-            ->name(Util::getServerApi())
+            ->traceId(Common\Util::traceId())
+            ->id(Common\Util::spanId())
+            ->name(Common\Util::getServerApi())
+            ->decision($decision)
             ->localEndpoint($this->localEndpoint());
         $this->currentSpan($span);
         $this->joinSpan($span);
@@ -189,6 +197,12 @@ class SimpleTracer
                     'traceId' => $this->currentSpan()->traceId,
                     'spanId' => $this->currentSpan()->id,)
                 : array();
+            foreach (array_keys($associate) as $key) {
+                if (isset($this->logs[$key])) {
+                    $this->logs[$key . '_' . Common\Util::random(6)] = $this->logs[$key];
+                    unset($this->logs[$key]);
+                }
+            }
             $logs = array_merge($associate, $this->logs);
         }
         Reporter::collect($spans, $logs);
@@ -206,9 +220,9 @@ class SimpleTracer
         if (!$this->localEndpoint) {
             $this->localEndpoint = new Endpoint();
             $this->localEndpoint
-                ->serviceName(Util::getServerName())
-                ->ip(Util::getServerIp())
-                ->port(Util::getServerPort());
+                ->serviceName(Common\Util::getServerName())
+                ->ip(Common\Util::getServerIp())
+                ->port(Common\Util::getServerPort());
         }
         return $this->localEndpoint;
     }

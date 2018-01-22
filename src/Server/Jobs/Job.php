@@ -69,6 +69,14 @@ class Job
     }
 
     /**
+     * @param $msg
+     */
+    public function log($msg)
+    {
+        echo $msg . PHP_EOL;
+    }
+
+    /**
      *
      */
     public function __destruct()

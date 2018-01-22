@@ -13,6 +13,11 @@ class Util
 {
     const UTF_8 = "UTF-8";
 
+    public static function sampleOrNot($rate)
+    {
+        return mt_rand(1, 100) <= (int)$rate;
+    }
+
     /**
      * @return string
      */
@@ -215,7 +220,7 @@ class Util
      * @param $length
      * @return string
      */
-    private static function random($length)
+    public static function random($length)
     {
         if (function_exists("random_bytes")) {
             $bytes = random_bytes(ceil($length / 2));

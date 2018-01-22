@@ -27,8 +27,12 @@ class Trace extends Job
         if (!$span_array) {
             return;
         }
+        $this->log("ACCEPT PART OF SPANS");
         foreach ($span_array as $arr) {
             $span = Core\Span::revertFromArray($arr);
+            if (!$span->decision->sampled()) {
+                continue;
+            }
             $this->pretreatment($span);
             if ($span->shared) {
                 if ($part_of_span = $this->getPartSpan($span)) {
@@ -89,6 +93,7 @@ class Trace extends Job
      */
     private function saveSpan(Core\Span &$span)
     {
+        $this->log("SAVE PART OF SPAN INTO MYSQL");
         // save annotations
         $this->saveAnnotations($span);
 
@@ -204,6 +209,7 @@ class Trace extends Job
             throw new Exception\UnusableException('redis is unusable!');
         }
         $res = $rs->set($span->idString(), $this->encode($span), 1800);
+        $this->log("SAVE PART OF SPAN INTO REDIS");
         return $res;
     }
 
@@ -213,8 +219,8 @@ class Trace extends Job
      */
     private function encode(Core\Span &$span)
     {
-//        return json_encode($span->convertToArray());
-        return @serialize($span->convertToArray());
+        return json_encode($span->convertToArray());
+//        return @serialize($span->convertToArray());
     }
 
     /**
@@ -223,8 +229,8 @@ class Trace extends Job
      */
     public function decode($str)
     {
-//        return Core\Span::revertFromArray(@json_decode($str, 1));
-        return Core\Span::revertFromArray(@unserialize($str));
+        return Core\Span::revertFromArray(@json_decode($str, 1));
+//        return Core\Span::revertFromArray(@unserialize($str));
     }
 
     /**

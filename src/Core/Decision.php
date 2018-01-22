@@ -6,11 +6,11 @@
  */
 namespace Tricolor\ZTracker\Core;
 
-use Tricolor\ZTracker\Config\TraceEnv;
+use Tricolor\ZTracker\Config;
 
 class Decision
 {
-    public $decision;
+    private $decision;
 
     public function __construct($value = null)
     {
@@ -33,10 +33,31 @@ class Decision
         return $this;
     }
 
-    public function sampleRate()
+    public function switchOver($on_off)
     {
-        if (!isset($this->decision)) {return 0;}
-        return $this->decision & 127;
+        if ($on_off <= 0) {
+            return false;
+        }
+        $move = floor(log($on_off, 2)) - 1;
+        if ($move < 0) {
+            return false;
+        }
+        $this->decision = $this->decision & (3 << $move) ^ $this->decision | $on_off;
+        return $this;
+    }
+
+    public function sampled()
+    {
+        if (!isset($this->decision)) {
+            return false;
+        }
+        if (($this->decision & Config\TraceEnv::SAMPLED) === Config\TraceEnv::SAMPLED) {
+            return true;
+        }
+        if (($this->decision & Config\TraceEnv::NOT_SAMPLED) === Config\TraceEnv::NOT_SAMPLED) {
+            return false;
+        }
+        return false;
     }
 
     public function traceOn()
@@ -44,10 +65,10 @@ class Decision
         if (!isset($this->decision)) {
             return true;
         }
-        if (($this->decision & TraceEnv::TRACE_ON) === TraceEnv::TRACE_ON) {
+        if (($this->decision & Config\TraceEnv::TRACE_ON) === Config\TraceEnv::TRACE_ON) {
             return true;
         }
-        if (($this->decision & TraceEnv::TRACE_OFF) === TraceEnv::TRACE_OFF) {
+        if (($this->decision & Config\TraceEnv::TRACE_OFF) === Config\TraceEnv::TRACE_OFF) {
             return false;
         }
         return true;
@@ -58,10 +79,10 @@ class Decision
         if (!isset($this->decision)) {
             return true;
         }
-        if (($this->decision & TraceEnv::REPORT_ON) === TraceEnv::REPORT_ON) {
+        if (($this->decision & Config\TraceEnv::REPORT_ON) === Config\TraceEnv::REPORT_ON) {
             return true;
         }
-        if (($this->decision & TraceEnv::REPORT_OFF) === TraceEnv::REPORT_OFF) {
+        if (($this->decision & Config\TraceEnv::REPORT_OFF) === Config\TraceEnv::REPORT_OFF) {
             return false;
         }
         return true;
@@ -72,10 +93,10 @@ class Decision
         if (!isset($this->decision)) {
             return true;
         }
-        if (($this->decision & TraceEnv::LOG_ON) === TraceEnv::LOG_ON) {
+        if (($this->decision & Config\TraceEnv::LOG_ON) === Config\TraceEnv::LOG_ON) {
             return true;
         }
-        if (($this->decision & TraceEnv::LOG_OFF) === TraceEnv::LOG_OFF) {
+        if (($this->decision & Config\TraceEnv::LOG_OFF) === Config\TraceEnv::LOG_OFF) {
             return false;
         }
         return true;
@@ -95,6 +116,6 @@ class Decision
      */
     public function convertToInt()
     {
-        return $this->decision;
+        return (int)$this->decision;
     }
 }

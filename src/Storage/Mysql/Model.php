@@ -118,13 +118,14 @@ class Model
     public function insert($cols)
     {
         try {
+            self::log("INSERT INTO " . self::getTable());
             $cols = isset($cols) ? $cols : get_object_vars($this);
             return $insert_id = self::$conn
                 ->insert(self::getTable())
                 ->cols($cols)
                 ->query();
         } catch (\PDOException $e) {
-            echo $e->getMessage() . PHP_EOL;
+            self::log($e->getMessage());
         }
         return false;
     }
@@ -136,5 +137,13 @@ class Model
     {
         $ref = new static();
         return $ref::table;
+    }
+
+    /**
+     * @param $msg
+     */
+    private static function log($msg)
+    {
+        echo $msg . PHP_EOL;
     }
 }

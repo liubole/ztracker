@@ -19,13 +19,12 @@ $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 function clientContent()
 {
     // index
+    \Tricolor\ZTracker\Config\TraceEnv::$sampleRate = 50;
     $tracer = GlobalTracer::tracer();
     {
-        $sampleRate = 50;
         $tracer->newSpan()
             ->kind(SpanKind\Server)
-            ->shared(0)
-            ->decision(GlobalTracer::decisionBuilder($sampleRate));
+            ->shared(0);
     }
     $tracer->currentSpan()->putTag('', '');
     $tracer->setContext("key0", "value0");
