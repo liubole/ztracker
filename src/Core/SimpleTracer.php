@@ -177,9 +177,12 @@ class SimpleTracer
         if (!$this->reportSpans) {
             return;
         }
+        $reports = array();
         foreach ($this->reportSpans as &$span) {
-            if ($span instanceof Span)
-                $span = $span->convertToArray();
+            if ($span instanceof Span) {
+                if (!$span->traceId || !$span->id) continue;
+                array_push($reports, $span->convertToArray());
+            }
         }
         $reportOn = $this->currentSpan()->decision
             ? $this->currentSpan()->decision->reportOn()
@@ -188,8 +191,8 @@ class SimpleTracer
             ? $this->currentSpan()->decision->logOn()
             : true;
         $logs = $spans = null;
-        if ($reportOn && $this->reportSpans) {
-            $spans =& $this->reportSpans;
+        if ($reportOn && $reports) {
+            $spans =& $reports;
         }
         if ($logOn && $this->logs) {
             $associate = $this->currentSpan()
