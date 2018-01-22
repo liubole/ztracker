@@ -48,6 +48,18 @@ class Span extends Model
      */
     const table = "zipkin_spans";
 
+    /**
+     * @return bool|mixed
+     */
+    public function save()
+    {
+        $cols = get_object_vars($this);
+        if (is_null($this->parent_id)) {
+            unset($cols['parent_id']);
+        }
+        return $this->insert($cols);
+    }
+
     public function __construct()
     {
         parent::__construct();
