@@ -195,12 +195,16 @@ class SimpleTracer
             $spans =& $reports;
         }
         if ($logOn && $this->logs) {
-            $associate = $this->currentSpan()
-                ? array(
-                    'traceId' => $this->currentSpan()->traceId,
-                    'spanId' => $this->currentSpan()->id,
-                    'timestamp' => Common\Util::currentInHuman($this->currentSpan()->timestamp),)
-                : array('timestamp' => Common\Util::currentInHuman());
+            $traceId = $spanId = $timestamp = null;
+            if ($this->currentSpan()) {
+                $traceId = $this->currentSpan()->traceId;
+                $spanId = $this->currentSpan()->id;
+                $timestamp = $this->currentSpan()->timestamp;
+            }
+            $h = Common\Util::currentInHuman($timestamp);
+            $associate = $traceId
+                ? array('traceId' => $traceId, 'spanId' => $spanId, 'timestamp' => $h,)
+                : array('timestamp' => $h);
             foreach (array_keys($associate) as $key) {
                 if (isset($this->logs[$key])) {
                     $this->logs[$key . '_' . Common\Util::random(6)] = $this->logs[$key];
