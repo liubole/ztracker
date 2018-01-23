@@ -69,11 +69,13 @@ class Trace extends Job
             }
         }
         if ($span->kind == Core\SpanKind\Client) {
+            // cs => sr => ss => sr
             $span->addAnnotation(Core\Annotation::create(
-                $span->timestamp, Core\Constants::CLIENT_RECV, $span->localEndpoint));
+                $span->timestamp, Core\Constants::CLIENT_SEND, $span->localEndpoint));
 	        $span->addAnnotation(Core\Annotation::create(
-                Common\Util::endTs($span->timestamp, $span->duration), Core\Constants::CLIENT_SEND, $span->localEndpoint));
+                Common\Util::endTs($span->timestamp, $span->duration), Core\Constants::CLIENT_RECV, $span->localEndpoint));
         } elseif ($span->kind == Core\SpanKind\Server) {
+            // The server receive a request behind the client sent it!
             $span->addAnnotation(Core\Annotation::create(
                 $span->timestamp, Core\Constants::SERVER_RECV, $span->localEndpoint));
             $span->addAnnotation(Core\Annotation::create(

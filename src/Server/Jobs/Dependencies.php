@@ -14,14 +14,29 @@ use Tricolor\ZTracker\Common;
 
 class Dependencies extends Job
 {
+    /**
+     * @var string date(e.g. 2018-01-22)
+     */
     private $day;
+    /**
+     * @var float midnight in seconds
+     */
     private $midnight;
+    /**
+     * @var string
+     */
     private $timezone;
+    /**
+     * @var array
+     */
     private $dependencies;
     /**
      * @var Storage\Mysql\MysqlConnection
      */
     private static $conn;
+    /**
+     * @var Server\NodeLinks
+     */
     private $links;
 
     public function __construct()
@@ -42,6 +57,7 @@ class Dependencies extends Job
     public function day($day)
     {
         $this->day = $day;
+        $this->log('>Dependencies at ' . $day . ' are in calculation...');
         $this->midnight = Common\Util::midnightUTC($day, $this->timezone);
         return $this;
     }
@@ -55,6 +71,7 @@ class Dependencies extends Job
         foreach ($rows as $row) {
             $this->links->putTrace($row);
         }
+        $this->log('>There are ' . $this->links->nodesCount() . ' nodes in total!');
         $this->calOutRelations();
         $this->storeToDb();
     }
@@ -88,7 +105,8 @@ class Dependencies extends Job
                 if (!$child || !$parent) {
                     continue;
                 }
-                $this->manageRelations($parent, $child);
+                $count = $this->manageRelations($parent, $child);
+                $this->log('>Parent-Child: ' . $parent . '-' . $child . ':' . $count);
             }
         }
     }
@@ -101,7 +119,8 @@ class Dependencies extends Job
         foreach ($this->dependencies as $parentChild => $callCount) {
             $pair = explode('<:', $parentChild);
             $d = new Storage\Mysql\Dependencies();
-            $d->parent($pair[0])
+            $d->day($this->day)
+                ->parent($pair[0])
                 ->child($pair[1])
                 ->callCount($callCount)
                 ->replaceInto();
@@ -115,7 +134,7 @@ class Dependencies extends Job
      */
     private function manageRelations($parent, $child)
     {
-        if (!$parent || $child) {
+        if (!$parent || !$child) {
             return false;
         }
         $key = $parent . "<:" . $child;
@@ -130,7 +149,7 @@ class Dependencies extends Job
      */
     private function fetchData()
     {
-        $microsLower = bcmul($this->midnight, 1000, 0);
+        $microsLower = bcmul($this->midnight, 1000000, 0);
         $microsUpper = bcsub(bcadd($microsLower, Common\Util::daysToMicros(), 0), 1, 0);
 
         $fields = "s.trace_id, s.parent_id, s.id, a.a_key, a.endpoint_service_name, a.a_type";

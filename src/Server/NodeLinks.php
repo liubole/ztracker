@@ -58,10 +58,21 @@ class NodeLinks
      */
     public function &findParent(Node &$node)
     {
-        if ($node->isRoot()) return null;
-        $id_str = $node->trace_id . $node->parent_id;
-        $nodes =& $this->traces[$node->trace_id];
-        return ($nodes && isset($nodes[$id_str])) ? $nodes[$id_str] : null;
+        $parent = null;
+        if (!$node->isRoot()) {
+            $id_str = $this->nodeKey($node->trace_id, $node->parent_id);
+            $nodes =& $this->traces[$node->trace_id];
+            $parent = ($nodes && isset($nodes[$id_str])) ? $nodes[$id_str] : null;
+        }
+        return $parent;
+    }
+
+    /**
+     * @return int
+     */
+    public function nodesCount()
+    {
+        return count($this->traces);
     }
 
     /**

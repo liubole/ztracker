@@ -34,6 +34,16 @@ class Dependencies extends Model
     const table = "zipkin_dependencies";
 
     /**
+     * @param $day
+     * @return Dependencies
+     */
+    public function day($day)
+    {
+        $this->day = $day;
+        return $this;
+    }
+
+    /**
      * @param $parent
      * @return Dependencies
      */

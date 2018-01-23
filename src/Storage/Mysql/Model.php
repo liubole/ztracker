@@ -7,6 +7,7 @@
 namespace Tricolor\ZTracker\Storage\Mysql;
 
 use Tricolor\ZTracker\Config;
+use Tricolor\ZTracker\Common;
 
 class Model
 {
@@ -39,11 +40,13 @@ class Model
      */
     public function replaceInto()
     {
+        self::log("REPLACE INTO " . self::getTable());
         $vars = get_object_vars($this);
         $keys = array_keys($vars);
         $values = array_values($vars);
-        $sql = 'REPLACE INTO '.self::getTable().' ('.implode(', ', $keys).') VALUES ('.implode("', '", $values).')';
-        return $affected = self::$conn->pureQuery($sql)->rowCount();
+        $sql = 'REPLACE INTO %s (`%s`) VALUES (\'%s\')';
+        $query = Common\Util::strFormat($sql, self::getTable(), implode('`, `', $keys), implode("', '", $values));
+        return $affected = self::$conn->pureQuery($query)->rowCount();
     }
 
     /**

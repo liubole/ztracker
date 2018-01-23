@@ -444,8 +444,9 @@ class Span
                 $span->$key = Endpoint::revertFromArray($vars[$key]);
             } else if ($key == 'annotations' || $key == 'binaryAnnotations') {
                 if (is_array($vars[$key])) {
+                    isset($span->$key) OR ($span->$key = array());
                     foreach ($vars[$key] as $k => $v) {
-                        $span->$key[$k] = Annotation::revertFromArray($v);
+                        array_push($span->$key, Annotation::revertFromArray($v));
                     }
                 }
             } else {

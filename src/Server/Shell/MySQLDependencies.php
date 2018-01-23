@@ -12,7 +12,7 @@ class MySQLDependencies
 {
     public function run($day)
     {
-        isset($day) OR ($day = date('Y_m-d'));
+        isset($day) OR ($day = date('Y-m-d'));
         $dependencies = new Server\Jobs\Dependencies();
         $dependencies->day($day)->run();
     }
