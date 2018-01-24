@@ -205,7 +205,27 @@ class SimpleTracer
         return $this;
     }
 
+    /**
+     * End trace & collect data
+     * PS: called behind server-return
+     */
     public function flush()
+    {
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+            $this->collect();
+        } else if (function_exists('register_shutdown_function')) {
+            $that = &$this;
+            register_shutdown_function(function () use (&$that) {
+                $that->collect();
+            });
+        }
+    }
+
+    /**
+     *
+     */
+    private function collect()
     {
         if (!$this->reportSpans) {
             return;
