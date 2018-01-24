@@ -15,6 +15,6 @@ class Logger
         if (!is_dir($dir)) {
             mkdir($dir, 777, true);
         }
-        file_put_contents($file, $str . "\n", FILE_APPEND);
+        file_put_contents($file, $str . PHP_EOL, FILE_APPEND);
     }
 }

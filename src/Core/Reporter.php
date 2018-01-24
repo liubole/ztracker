@@ -79,8 +79,9 @@ class Reporter
     private static function logLogs(&$logs)
     {
         if ($logs && Collector\BizLoggerFile::ready()) {
+            $day = self::pickDay($logs);
             $message = self::encode($logs, Config\Reporter::$logType);
-            return Collector\BizLoggerFile::write($message);
+            return Collector\BizLoggerFile::write($message, $day);
         }
         return false;
     }
@@ -131,5 +132,14 @@ class Reporter
         } catch (\Exception $e) {
         }
         return null;
+    }
+
+    private static function pickDay($logs)
+    {
+        if (isset($logs['timestamp'])) {
+            $tmp = explode('.', $logs['timestamp']);
+            return date("Ymd", strtotime($tmp[0]));
+        }
+        return date("Ymd");
     }
 }

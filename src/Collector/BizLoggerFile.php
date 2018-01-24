@@ -10,36 +10,55 @@ use Tricolor\ZTracker\Config;
 
 class BizLoggerFile
 {
-    public static function write($message)
+    public static function write($message, $day = null)
     {
-        if (!$message || !($file = self::ready())) {
+        if (!$message || !($file = self::ready($day))) {
             return false;
         }
-        return file_put_contents($file, $message . "\n", FILE_APPEND);
+        return file_put_contents($file, $message . PHP_EOL, FILE_APPEND);
     }
 
-    public static function ready()
+    public static function ready($day = null)
     {
-        $root = Config\BizLogger::$root;
+        $root = self::getRoot();
         if (!$root) {
             return false;
         }
         if (!is_dir($root) AND !mkdir($root, 766, true)) {
             return false;
         }
-        $logname = Config\BizLogger::$log_name;
-        $file = rtrim($root, '/') . '/' . ($logname ? $logname : "trace.log");
+        $file = self::getFileName($day);
         if (file_exists($file) OR touch($file)) {
             return $file;
         }
         return false;
     }
 
+    private static function getFileName($day = null)
+    {
+        $day = $day ? date("Ymd", strtotime($day)) : date("Ymd");
+        $root = self::getRoot();
+        $logname = Config\BizLogger::$log_name
+            ? Config\BizLogger::$log_name
+            : "biz-ztrace.log";
+        $idx = strrpos($logname, '.');
+        $file = $idx !== false
+            ? substr($logname, 0, $idx) . '.' . $day . substr($logname, $idx)
+            : $logname . '.' . $day;
+        return rtrim($root, '/') . '/' . $file;
+    }
+
+    private static function getRoot()
+    {
+        return Config\BizLogger::$root;
+    }
+
     public function logger($fileName)
     {
         $fileHandle = fopen($fileName, 'a');
         while (true) {
-            fwrite($fileHandle, yield . "\n");
+            fwrite($fileHandle, yield . PHP_EOL);
         }
     }
+
 }

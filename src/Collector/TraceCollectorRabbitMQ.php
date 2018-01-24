@@ -10,6 +10,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Tricolor\ZTracker\Config;
+use Tricolor\ZTracker\Common;
 
 class TraceCollectorRabbitMQ
 {
@@ -118,6 +119,7 @@ class TraceCollectorRabbitMQ
                     $config['keepalive'],
                     $config['heartbeat']);
             } catch (\Exception $e) {
+                Common\Logger::error($e->getMessage());
                 throw $e;
             }
         }

@@ -15,7 +15,7 @@ class TraceCollectorFile
         if (!$message || !($file = self::ready())) {
             return false;
         }
-        return file_put_contents($file, $message . "\n", FILE_APPEND);
+        return file_put_contents($file, $message . PHP_EOL, FILE_APPEND);
     }
 
     public static function ready()
@@ -39,7 +39,7 @@ class TraceCollectorFile
     {
         $fileHandle = fopen($fileName, 'a');
         while (true) {
-            fwrite($fileHandle, yield . "\n");
+            fwrite($fileHandle, yield . PHP_EOL);
         }
     }
 }
