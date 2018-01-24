@@ -11,6 +11,9 @@ if (version_compare(PHP_VERSION, '5.4.0') < 0) {
 if (!extension_loaded('pdo_mysql')) {
     printf('It\'s required to install extension %s.' . PHP_EOL, 'pdo_mysql');
 }
+if (PHP_INT_MAX === 2147483647) {
+    printf('64-bit Architecture is required.' . PHP_EOL);
+}
 
 // recommend
 if (!extension_loaded('pcntl')) {
