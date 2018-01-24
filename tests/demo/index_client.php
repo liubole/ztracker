@@ -19,7 +19,7 @@ $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 function clientContent()
 {
     // index
-    \Tricolor\ZTracker\Config\TraceEnv::$sampleRate = 50;
+    \Tricolor\ZTracker\Config\Collector::$sampleRate = 50;
     $tracer = GlobalTracer::tracer();
     {
         $tracer->newSpan()
