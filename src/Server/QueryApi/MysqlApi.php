@@ -316,6 +316,6 @@ class MysqlApi
      */
     private function microSec($micro_sec)
     {
-        return (float)$micro_sec;
+        return $micro_sec;
     }
 }

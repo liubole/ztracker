@@ -26,13 +26,13 @@ class SetEnv
     /**
      * @param bool $force
      */
-    public static function precision($force = null)
+    public static function precision($force = true)
     {
         $precision = $force
             ? Config\TraceEnv::$precision
             : ini_get('precision')
                 ? ini_get('precision')
                 : Config\TraceEnv::$precision;
-        ini_set('date.timezone', $precision);
+        ini_set('precision', $precision);
     }
 }
