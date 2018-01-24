@@ -259,7 +259,7 @@ class Util
      * @param $url
      * @return string
      */
-    public static function urlPath($url)
+    public static function urlApi($url)
     {
         $vars = parse_url($url);
         return isset($vars['path']) ? $vars['path'] : '/';

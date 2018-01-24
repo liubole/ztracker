@@ -6,7 +6,7 @@
  */
 namespace Tricolor\ZTracker\Config;
 
-class TraceCollector
+class Collector
 {
     // file collector
     public static $root = '/tmp';
@@ -45,4 +45,6 @@ class TraceCollector
             self::$rabbit_config = array_merge(self::$rabbit_config, $config);
         }
     }
+
+    public static $sampleRate = 5;
 }

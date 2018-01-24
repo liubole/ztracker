@@ -11,6 +11,7 @@ use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Config;
 use Tricolor\ZTracker\Core;
 use Tricolor\ZTracker\Server;
+use Tricolor\ZTracker\Prepare;
 
 class MysqlApi
 {
@@ -20,6 +21,7 @@ class MysqlApi
     public function __construct()
     {
         $this->conn = Storage\Mysql\MysqlConnection::getConnection(Config\Storage\Mysql::get());
+        Prepare\SetEnv::precision();
     }
 
     /**

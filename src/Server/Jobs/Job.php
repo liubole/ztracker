@@ -6,6 +6,8 @@
  */
 namespace Tricolor\ZTracker\Server\Jobs;
 
+use Tricolor\ZTracker\Prepare;
+
 class Job
 {
     /**
@@ -24,6 +26,7 @@ class Job
                 });
             }
         }
+        Prepare\SetEnv::timezone();
     }
 
     /**

@@ -77,7 +77,7 @@ class SimpleTracer
     {
         // sample or not
         $decision = GlobalTracer::decisionBuilder();
-        $sampled = Common\Util::sampleOrNot(Config\TraceEnv::$sampleRate)
+        $sampled = Common\Util::sampleOrNot(Config\Collector::$sampleRate)
             ? Config\TraceEnv::SAMPLED
             : Config\TraceEnv::NOT_SAMPLED;
         $decision->switchOver($sampled);

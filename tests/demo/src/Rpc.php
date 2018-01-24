@@ -22,7 +22,7 @@ class Rpc
 
         $tracer = Core\GlobalTracer::tracer();
         $span = $tracer->newChildSpan()
-            ->name(Common\Util::urlPath($url))
+            ->name(Common\Util::urlApi($url))
             ->shared(1)
             ->kind(Core\SpanKind\Client);
         $tracer->injector(CarrierType\HttpHeader)->inject($headers);

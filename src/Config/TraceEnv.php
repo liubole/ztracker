@@ -24,6 +24,6 @@ class TraceEnv
 //    const COMPRESS_OFF = 0xc000;
 
     public static $timezone = 'Asia/Shanghai';
+    public static $precision = 18;
 
-    public static $sampleRate = 5;
 }

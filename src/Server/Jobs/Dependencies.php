@@ -45,8 +45,7 @@ class Dependencies extends Job
         $this->dependencies = array();
         $this->links = new Server\NodeLinks();
 
-        $timezone = ini_get('date.timezone');
-        $this->timezone = $timezone ? $timezone : Config\TraceEnv::$timezone;
+        $this->timezone = ini_get('date.timezone');
         self::$conn = Storage\Mysql\MysqlConnection::getConnection(Config\Storage\Mysql::get());
     }
 

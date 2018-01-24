@@ -129,7 +129,7 @@ class TraceCollectorRabbitMQ
      */
     private static function exchange()
     {
-        return Config\TraceCollector::$rabbit_exchange;
+        return Config\Collector::$rabbit_exchange;
     }
 
     /**
@@ -137,7 +137,7 @@ class TraceCollectorRabbitMQ
      */
     private static function queue()
     {
-        return Config\TraceCollector::$rabbit_queue;
+        return Config\Collector::$rabbit_queue;
     }
 
     /**
@@ -145,7 +145,7 @@ class TraceCollectorRabbitMQ
      */
     private static function key()
     {
-        return Config\TraceCollector::$rabbit_key;
+        return Config\Collector::$rabbit_key;
     }
 
     /**
@@ -153,6 +153,6 @@ class TraceCollectorRabbitMQ
      */
     private static function getConfig()
     {
-        return Config\TraceCollector::getRabbitConfig();
+        return Config\Collector::getRabbitConfig();
     }
 }
