@@ -3,7 +3,8 @@
   "description": "openzipkin in php(client)",
   "keywords": [
     "track",
-    "debug"
+    "debug",
+    "openzipkin"
   ],
   "time": "2017-12-10",
   "license": "MIT License",
