@@ -8,11 +8,7 @@ namespace Tricolor\ZTracker\Config;
 
 class Collector
 {
-    // file collector
-    public static $root = '/tmp';
-    public static $log_name = 'ztrace.log';
-
-    // rabbitmq collector
+    // rabbitmq collector(the default collector)
     public static $rabbit_exchange = 'ztrace';
     public static $rabbit_queue = 'ztrace';
     public static $rabbit_key = 'ztrace.log';

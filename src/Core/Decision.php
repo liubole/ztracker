@@ -27,15 +27,10 @@ class Decision
         return null;
     }
 
-    public function setValue($value)
-    {
-        $this->decision = (int)$value;
-        return $this;
-    }
-
     public function switchOver($on_off)
     {
-        if ($on_off <= 0) {
+        if (!in_array($on_off, $this->getAllSwitch(), true)
+        ) {
             return false;
         }
         $move = floor(log($on_off, 2)) - 1;
@@ -117,5 +112,19 @@ class Decision
     public function convertToInt()
     {
         return (int)$this->decision;
+    }
+
+    private function getAllSwitch()
+    {
+        return array(
+            Config\TraceEnv::SAMPLED,
+            Config\TraceEnv::NOT_SAMPLED,
+            Config\TraceEnv::TRACE_OFF,
+            Config\TraceEnv::TRACE_ON,
+            Config\TraceEnv::LOG_OFF,
+            Config\TraceEnv::LOG_ON,
+            Config\TraceEnv::REPORT_OFF,
+            Config\TraceEnv::REPORT_ON
+        );
     }
 }

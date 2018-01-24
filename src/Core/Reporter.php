@@ -34,8 +34,6 @@ class Reporter
             switch (Config\Reporter::$reporter) {
                 case Config\Reporter::reporterRabbitMQ:
                     return self::reportSpanByRabbitMQ($spans);
-                case Config\Reporter::reporterFile:
-                    return self::reportSpanToFile($spans);
                 default:
                     return false;
             }
@@ -54,19 +52,6 @@ class Reporter
             $message = Common\Compress::spansCompress($spans);
             Collector\TraceCollectorRabbitMQ::pub($message);
             return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param $spans
-     * @return bool|int
-     */
-    private static function reportSpanToFile(&$spans)
-    {
-        if ($spans && Collector\TraceCollectorFile::ready()) {
-            $message = Common\Compress::spansCompress($spans, false);
-            return Collector\TraceCollectorFile::write($message);
         }
         return false;
     }

@@ -19,7 +19,6 @@ class Reporter
      * report important data to server
      */
     const reporterRabbitMQ = 'rabbitmq';
-    const reporterFile = 'file';
 
     /**
      * Log format: 'json' or 'serialize'
