@@ -8,7 +8,5 @@ namespace Tricolor\ZTracker\Config;
 
 class BizLogger
 {
-    public static $root = '/tmp';
-
-    public static $log_name = 'biz-ztrace.log';
+    public static $output = '/tmp/biz-ztrace.log';
 }

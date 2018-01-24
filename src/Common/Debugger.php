@@ -6,9 +6,9 @@
  */
 namespace Tricolor\ZTracker\Common;
 
-use Tricolor\ZTracker\Common;
+use Tricolor\ZTracker\Config;
 
-class Logger
+class Debugger
 {
     const WARNING = 1;
     const ERROR = 2;
@@ -28,13 +28,12 @@ class Logger
         if (!$message || !($file = self::ready())) {
             return false;
         }
-        $at = Common\Util::currentInHuman();
-        if (($idx = strrpos($at, '.')) !== false) {
-            $gap = strlen($at) - strrpos($at, '.') - 1;
-            if ($gap < 8) $at .= str_repeat('0', 8 - $gap);
+        if (!Config\Debug::$ON) {
+            return false;
         }
+        $at = date('Y-m-d H:i:s');
         $lev = self::resolve($level);
-        return file_put_contents($file, "[$at][$lev]$message" . PHP_EOL, FILE_APPEND);
+        return file_put_contents($file, "[$at] [$lev] $message" . PHP_EOL, FILE_APPEND);
     }
 
     private static function resolve($level)
@@ -67,11 +66,23 @@ class Logger
 
     private static function getFileName()
     {
-        return self::getRoot() . '/ztrace-debug.log';
+        $root = self::getRoot();
+        if (!Config\Debug::$output) {
+            $base = pathinfo(Config\Debug::$output, PATHINFO_BASENAME);
+            $ext = pathinfo(Config\Debug::$output, PATHINFO_EXTENSION);
+            $file = $ext
+                ? substr($base, 0, strrpos($base, $ext)) . $ext
+                : $base;
+            return rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
+        }
+        return $root . '/debug-ztrace.log';
     }
 
     private static function getRoot()
     {
-        return '/tmp';
+        if (!Config\Debug::$output) {
+            return "/tmp";
+        }
+        return pathinfo(Config\Debug::$output, PATHINFO_DIRNAME);
     }
 }

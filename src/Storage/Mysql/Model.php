@@ -128,7 +128,7 @@ class Model
                 ->cols($cols)
                 ->query();
         } catch (\PDOException $e) {
-            self::log($e->getMessage());
+            self::log($e->getMessage(), true);
         }
         return false;
     }
@@ -144,9 +144,12 @@ class Model
 
     /**
      * @param $msg
+     * @param $error
      */
-    private static function log($msg)
+    private static function log($msg, $error = false)
     {
-        echo $msg . PHP_EOL;
+        $error
+            ? Common\Debugger::error($msg)
+            : Common\Debugger::warning($msg);
     }
 }

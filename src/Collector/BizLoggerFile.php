@@ -38,19 +38,23 @@ class BizLoggerFile
     {
         $day = $day ? date("Ymd", strtotime($day)) : date("Ymd");
         $root = self::getRoot();
-        $logname = Config\BizLogger::$log_name
-            ? Config\BizLogger::$log_name
-            : "biz-ztrace.log";
-        $idx = strrpos($logname, '.');
-        $file = $idx !== false
-            ? substr($logname, 0, $idx) . '.' . $day . substr($logname, $idx)
-            : $logname . '.' . $day;
-        return rtrim($root, '/') . '/' . $file;
+        if (!Config\BizLogger::$output) {
+            $base = pathinfo(Config\BizLogger::$output, PATHINFO_BASENAME);
+            $ext = pathinfo(Config\BizLogger::$output, PATHINFO_EXTENSION);
+            $file = $ext
+                ? substr($base, 0, strrpos($base, $ext)) . $day . '.' . $ext
+                : $base . '.' . $day;
+            return rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
+        }
+        return $root . '/biz-ztrace.' . $day . '.log';
     }
 
     private static function getRoot()
     {
-        return Config\BizLogger::$root;
+        if (!Config\BizLogger::$output) {
+            return "/tmp";
+        }
+        return pathinfo(Config\BizLogger::$output, PATHINFO_DIRNAME);
     }
 
     public function logger($fileName)

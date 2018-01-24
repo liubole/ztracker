@@ -24,7 +24,7 @@ class TraceCollectorRabbitMQ
         try {
             self::getConn();
         } catch (\Exception $e) {
-            // todo errorlog
+            Common\Debugger::error($e->getMessage());
             return false;
         }
         return !!self::$conn;
@@ -119,7 +119,7 @@ class TraceCollectorRabbitMQ
                     $config['keepalive'],
                     $config['heartbeat']);
             } catch (\Exception $e) {
-                Common\Logger::error($e->getMessage());
+                Common\Debugger::error($e->getMessage());
                 throw $e;
             }
         }

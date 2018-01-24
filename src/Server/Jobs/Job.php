@@ -7,6 +7,7 @@
 namespace Tricolor\ZTracker\Server\Jobs;
 
 use Tricolor\ZTracker\Prepare;
+use Tricolor\ZTracker\Common;
 
 class Job
 {
@@ -76,7 +77,7 @@ class Job
      */
     public function log($msg)
     {
-        echo $msg . PHP_EOL;
+        Common\Debugger::warning($msg);
     }
 
     /**
