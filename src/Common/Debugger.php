@@ -12,6 +12,7 @@ class Debugger
 {
     const WARNING = 1;
     const ERROR = 2;
+    const NOTICE = 3;
 
     public static function warning($message)
     {
@@ -23,6 +24,11 @@ class Debugger
         self::write(self::ERROR, $message);
     }
 
+    public static function notice($message)
+    {
+        self::write(self::NOTICE, $message);
+    }
+
     private static function write($level, $message)
     {
         if (!$message || !($file = self::ready())) {
@@ -30,6 +36,9 @@ class Debugger
         }
         if (!Config\Debug::$ON) {
             return false;
+        }
+        if (!is_string($message)) {
+            $message = var_export($message, 1);
         }
         $at = date('Y-m-d H:i:s');
         $lev = self::resolve($level);
@@ -43,6 +52,8 @@ class Debugger
                 return "WARNING";
             case self::ERROR:
                 return "ERROR";
+            case self::NOTICE:
+                return "NOTICE";
             default:
                 return "UNKNOWN";
         }

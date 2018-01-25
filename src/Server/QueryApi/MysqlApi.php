@@ -81,6 +81,7 @@ class MysqlApi
                 ? $this->spanTraceIdCondition($this->toTraceIdQuery($request))
                 : $this->spanTraceIdConditionSingle($traceId);
             $sql = "SELECT $spanFields FROM `zipkin_spans` WHERE $traceIdCondition";
+            Common\Debugger::notice($sql);
             $res = $this->conn->query($sql);
             $spansWithoutAnnotations = $trace_ids = array();
             foreach ($res as $row) {
@@ -90,10 +91,10 @@ class MysqlApi
                     $spansWithoutAnnotations[$trace_id] = array();
                 }
                 $spansWithoutAnnotations[$trace_id][] = array(
-                    'traceId' => $row['trace_id'],
+                    'traceId' => $this->idString($row['trace_id']),
                     'name' => $row['name'],
-                    'id' => $row['id'],
-                    'parentId' => $row['parent_id'],
+                    'id' => $this->idString($row['id']),
+                    'parentId' => $this->idString($row['parent_id']),
                     'timestamp' => $this->microSec($row['start_ts']),
                     'duration' => $this->microSec($row['duration']),
                     'debug' => $row['debug'],
@@ -317,5 +318,10 @@ class MysqlApi
     private function microSec($micro_sec)
     {
         return $micro_sec;
+    }
+
+    private function idString($id)
+    {
+        return (string)$id;
     }
 }

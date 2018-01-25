@@ -31,11 +31,11 @@ class GroupByTraceId
     {
         $groupedByTraceId = array();
         foreach ($spans as $span) {
-            $traceId = $span['traceId'];
-            if (!isset($groupedByTraceId[$traceId])) {
-                $groupedByTraceId[$traceId] = array();
+            $traceIdKey = ':>' . $span['traceId'];
+            if (!isset($groupedByTraceId[$traceIdKey])) {
+                $groupedByTraceId[$traceIdKey] = array();
             }
-            $groupedByTraceId[$traceId][] = $span;
+            $groupedByTraceId[$traceIdKey][] = $span;
         }
         $result = array();
         foreach ($groupedByTraceId as $sameTraceId) {

@@ -174,7 +174,10 @@ class Compress
      */
     private static function deflate($str)
     {
-        return gzdeflate($str);
+        if (extension_loaded('zlib')) {
+            return gzdeflate($str);
+        }
+        return $str;
     }
 
     /**
@@ -183,7 +186,10 @@ class Compress
      */
     private static function inflate($deflated)
     {
-        return gzinflate($deflated);
+        if (extension_loaded('zlib')) {
+            return gzinflate($deflated);
+        }
+        return $deflated;
     }
 
     /**
