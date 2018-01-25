@@ -17,7 +17,7 @@ class Mysql
     public static function set($db)
     {
         if (is_array($db)) {
-            foreach (array_intersect_key(get_class_vars(__NAMESPACE__ . DIRECTORY_SEPARATOR . 'Mysql'), $db) as $key => $v) {
+            foreach (array_intersect_key(get_class_vars(__CLASS__), $db) as $key => $v) {
                 self::$$key = $db[$key];
             }
         }
@@ -25,6 +25,6 @@ class Mysql
 
     public static function get()
     {
-        return get_class_vars(__NAMESPACE__ . DIRECTORY_SEPARATOR . 'Mysql');
+        return get_class_vars(__CLASS__);
     }
 }
