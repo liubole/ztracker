@@ -36,6 +36,7 @@ class Trace extends Job
             $this->pretreatment($span);
             if ($span->shared) {
                 if ($part_of_span = $this->getPartSpan($span)) {
+                    $this->delPartSpan($part_of_span);
                     $span->merge($part_of_span);
                     $this->saveSpan($span);
                 } else {
@@ -202,6 +203,22 @@ class Trace extends Job
 
     /**
      * @param Core\Span $span
+     * @return bool|int
+     */
+    private function delPartSpan(Core\Span &$span)
+    {
+        $rs = $this->getRedis();
+        if (!$rs) {
+            Common\Debugger::fatal("redis is unusable!");
+            return false;
+        }
+        $res = $rs->del($span->idString());
+        $this->log("DELETE PART OF SPAN FROM REDIS");
+        return $res;
+    }
+
+    /**
+     * @param Core\Span $span
      * @return bool
      * @throws Exception\UnusableException
      */
@@ -212,7 +229,7 @@ class Trace extends Job
             Common\Debugger::fatal("redis is unusable!");
             return false;
         }
-        $res = $rs->set($span->idString(), $this->encode($span), 1800);
+        $res = $rs->set($span->idString(), $this->encode($span), 1000);
         $this->log("SAVE PART OF SPAN INTO REDIS");
         return $res;
     }
