@@ -11,7 +11,7 @@ use Tricolor\ZTracker\Common;
 
 class Job
 {
-    private static $_OS;
+    protected static $_OS = 'linux';
     /**
      * Handler constructor.
      * @param array $signals
@@ -20,7 +20,7 @@ class Job
     {
         self::checkSapiEnv();
         self::daemonize();
-        echo get_class($this) . " start!" . PHP_EOL;
+        echo get_class($this) . " start! pid:" . $this->getPid()  . PHP_EOL;
         if (extension_loaded('pcntl')) {
             $signals = isset($signals) ? $signals : array(SIGTERM);
             $that = &$this;
@@ -113,11 +113,16 @@ class Job
         }
     }
 
+    public function getPid()
+    {
+        return getmypid();
+    }
+
     /**
      *
      */
     public function __destruct()
     {
-        echo get_class($this) . " end!" . PHP_EOL;
+        echo get_class($this) . " end! pid:" . $this->getPid() . PHP_EOL;
     }
 }
