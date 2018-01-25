@@ -10,13 +10,15 @@ use Tricolor\ZTracker\Config;
 
 class Debugger
 {
-    const WARNING = 1;
+    const FATAL = 1;
     const ERROR = 2;
-    const NOTICE = 3;
+    const WARNING = 3;
+    const NOTICE = 4;
+    const INFO = 5;
 
-    public static function warning($message)
+    public static function fatal($message)
     {
-        self::write(self::WARNING, $message);
+        self::write(self::FATAL, $message);
     }
 
     public static function error($message)
@@ -24,9 +26,19 @@ class Debugger
         self::write(self::ERROR, $message);
     }
 
+    public static function warning($message)
+    {
+        self::write(self::WARNING, $message);
+    }
+
     public static function notice($message)
     {
         self::write(self::NOTICE, $message);
+    }
+
+    public static function info($message)
+    {
+        self::write(self::INFO, $message);
     }
 
     private static function write($level, $message)
@@ -48,12 +60,16 @@ class Debugger
     private static function resolve($level)
     {
         switch ($level) {
-            case self::WARNING:
-                return "WARNING";
+            case self::FATAL:
+                return "FATAL";
             case self::ERROR:
                 return "ERROR";
+            case self::WARNING:
+                return "WARNING";
             case self::NOTICE:
                 return "NOTICE";
+            case self::INFO:
+                return "INFO";
             default:
                 return "UNKNOWN";
         }

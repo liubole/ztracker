@@ -7,6 +7,7 @@
 namespace Tricolor\ZTracker\Common;
 
 use Tricolor\ZTracker\Core;
+use Tricolor\ZTracker\Common;
 
 class Compress
 {
@@ -174,9 +175,10 @@ class Compress
      */
     private static function deflate($str)
     {
-        if (extension_loaded('zlib')) {
+        if (extension_loaded('zlib') && function_exists('gzdeflate')) {
             return gzdeflate($str);
         }
+        Common\Debugger::warning("Compress.deflate Fail!");
         return $str;
     }
 
@@ -186,9 +188,10 @@ class Compress
      */
     private static function inflate($deflated)
     {
-        if (extension_loaded('zlib')) {
+        if (extension_loaded('zlib') && function_exists('gzinflate')) {
             return gzinflate($deflated);
         }
+        Common\Debugger::warning("Compress.inflate Fail!");
         return $deflated;
     }
 

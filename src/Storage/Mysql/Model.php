@@ -150,6 +150,6 @@ class Model
     {
         $error
             ? Common\Debugger::error($msg)
-            : Common\Debugger::warning($msg);
+            : Common\Debugger::info($msg);
     }
 }

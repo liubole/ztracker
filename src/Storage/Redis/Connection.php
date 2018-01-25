@@ -6,7 +6,7 @@
  */
 namespace Tricolor\ZTracker\Storage\Redis;
 
-use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Common;
 
 class Connection
 {
@@ -20,8 +20,8 @@ class Connection
     public static function getConnection($config)
     {
         try {
-            $host = Util::checkNotNull($config['host'], 'redis config.host is null!');
-            $port = Util::checkNotNull($config['port'], 'redis config.port is null!');
+            $host = Common\Util::checkNotNull($config['host'], 'redis config.host is null!');
+            $port = Common\Util::checkNotNull($config['port'], 'redis config.port is null!');
             $timeout = (int)$config['timeout'];
             $key = '_' . $host . '_' . $port;
             if (!isset(self::$conns[$key]) || !self::$conns[$key]) {
@@ -31,6 +31,7 @@ class Connection
             }
             return self::$conns[$key];
         } catch (\Exception $e) {
+            Common\Debugger::fatal($e->getMessage());
             throw $e;
         }
     }
