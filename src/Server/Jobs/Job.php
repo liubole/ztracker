@@ -77,7 +77,7 @@ class Job
      */
     public function log($msg)
     {
-        Common\Debugger::warning($msg);
+        Common\Debugger::info($msg);
     }
 
     /**

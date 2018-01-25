@@ -192,7 +192,8 @@ class Trace extends Job
     {
         $rs = $this->getRedis();
         if (!$rs) {
-            throw new Exception\UnusableException('redis is unusable!');
+            Common\Debugger::fatal("redis is unusable!");
+            return null;
         }
         $res = $rs->get($span->idString());
         $part_of_span = $res !== false ? $this->decode($res) : null;
@@ -208,7 +209,8 @@ class Trace extends Job
     {
         $rs = $this->getRedis();
         if (!$rs) {
-            throw new Exception\UnusableException('redis is unusable!');
+            Common\Debugger::fatal("redis is unusable!");
+            return false;
         }
         $res = $rs->set($span->idString(), $this->encode($span), 1800);
         $this->log("SAVE PART OF SPAN INTO REDIS");
