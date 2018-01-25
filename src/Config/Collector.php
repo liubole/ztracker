@@ -6,6 +6,8 @@
  */
 namespace Tricolor\ZTracker\Config;
 
+use Tricolor\ZTracker\Common;
+
 class Collector
 {
     // rabbitmq collector(the default collector)
@@ -39,6 +41,8 @@ class Collector
     {
         if (is_array($config)) {
             self::$rabbit_config = array_merge(self::$rabbit_config, $config);
+        } else {
+            Common\Debugger::fatal("rabbitmq config is not array!");
         }
     }
 

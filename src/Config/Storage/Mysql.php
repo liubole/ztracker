@@ -6,6 +6,8 @@
  */
 namespace Tricolor\ZTracker\Config\Storage;
 
+use Tricolor\ZTracker\Common;
+
 class Mysql
 {
     public static $host = "";
@@ -20,6 +22,8 @@ class Mysql
             foreach (array_intersect_key(get_class_vars(__CLASS__), $db) as $key => $v) {
                 self::$$key = $db[$key];
             }
+        } else {
+            Common\Debugger::fatal("mysql config is not array!");
         }
     }
 

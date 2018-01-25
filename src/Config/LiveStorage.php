@@ -6,6 +6,8 @@
  */
 namespace Tricolor\ZTracker\Config;
 
+use Tricolor\ZTracker\Common;
+
 class LiveStorage
 {
     private static $redis_config = array(
@@ -21,8 +23,12 @@ class LiveStorage
 
     public static function setRedis($config)
     {
-        foreach (array_intersect_key(self::$redis_config, $config) as $key => $val) {
-            self::$redis_config[$key] = $config[$key];
+        if (is_array($config)) {
+            foreach (array_intersect_key(self::$redis_config, $config) as $key => $val) {
+                self::$redis_config[$key] = $config[$key];
+            }
+        } else {
+            Common\Debugger::fatal("redis config is not array!");
         }
     }
 }
