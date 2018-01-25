@@ -73,6 +73,7 @@ class Dependencies extends Job
         $this->log('>There are ' . $this->links->nodesCount() . ' nodes in total!');
         $this->calOutRelations();
         $this->storeToDb();
+        $this->catchSig();
     }
 
     /**

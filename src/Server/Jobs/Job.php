@@ -11,12 +11,15 @@ use Tricolor\ZTracker\Common;
 
 class Job
 {
+    private static $_OS;
     /**
      * Handler constructor.
      * @param array $signals
      */
     public function __construct($signals = null)
     {
+        self::checkSapiEnv();
+        self::daemonize();
         echo get_class($this) . " start!" . PHP_EOL;
         if (extension_loaded('pcntl')) {
             $signals = isset($signals) ? $signals : array(SIGTERM);
@@ -38,7 +41,7 @@ class Job
         switch ($signal) {
             case SIGTERM:
                 echo "Signal: $signal, ready to exit!" . PHP_EOL;
-                exit;
+                exit(0);
                 break;
         }
     }
@@ -78,6 +81,36 @@ class Job
     public function log($msg)
     {
         Common\Debugger::info($msg);
+    }
+
+    /**
+     * run in daemon
+     * @throws \Exception
+     */
+    protected static function daemonize()
+    {
+        if (static::$_OS !== 'linux') {
+            return;
+        }
+        $pid = pcntl_fork();
+        if (-1 === $pid) {
+            throw new \Exception('fork fail');
+        } else if ($pid > 0) {
+            exit(0);
+        }
+        if (-1 === posix_setsid()) {
+            throw new \Exception("setsid fail");
+        }
+    }
+
+    /**
+     *
+     */
+    protected static function checkSapiEnv()
+    {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            self::$_OS = 'windows';
+        }
     }
 
     /**
