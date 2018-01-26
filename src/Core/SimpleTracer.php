@@ -249,7 +249,8 @@ class SimpleTracer
             ? $this->currentSpan()->decision->logOn()
             : true;
         if ($logOn && $this->logs) {
-            $logs = $this->relatedWithSpan($this->currentSpan(), $this->logs);
+            $span = $this->currentSpan();
+            $logs = $this->relatedWithSpan($span, $this->logs);
         }
         Reporter::collect($spans, $logs);
     }
