@@ -27,7 +27,7 @@ class Decision
         return null;
     }
 
-    public function switchOver($on_off)
+    public function turn($on_off)
     {
         if (!in_array($on_off, $this->getAllSwitch(), true)
         ) {
@@ -55,19 +55,19 @@ class Decision
         return false;
     }
 
-    public function traceOn()
-    {
-        if (!isset($this->decision)) {
-            return true;
-        }
-        if (($this->decision & Config\TraceEnv::TRACE_ON) === Config\TraceEnv::TRACE_ON) {
-            return true;
-        }
-        if (($this->decision & Config\TraceEnv::TRACE_OFF) === Config\TraceEnv::TRACE_OFF) {
-            return false;
-        }
-        return true;
-    }
+//    public function traceOn()
+//    {
+//        if (!isset($this->decision)) {
+//            return true;
+//        }
+//        if (($this->decision & Config\TraceEnv::TRACE_ON) === Config\TraceEnv::TRACE_ON) {
+//            return true;
+//        }
+//        if (($this->decision & Config\TraceEnv::TRACE_OFF) === Config\TraceEnv::TRACE_OFF) {
+//            return false;
+//        }
+//        return true;
+//    }
 
     public function reportOn()
     {
@@ -119,8 +119,8 @@ class Decision
         return array(
             Config\TraceEnv::SAMPLED,
             Config\TraceEnv::NOT_SAMPLED,
-            Config\TraceEnv::TRACE_OFF,
-            Config\TraceEnv::TRACE_ON,
+//            Config\TraceEnv::TRACE_OFF,
+//            Config\TraceEnv::TRACE_ON,
             Config\TraceEnv::LOG_OFF,
             Config\TraceEnv::LOG_ON,
             Config\TraceEnv::REPORT_OFF,

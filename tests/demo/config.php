@@ -31,9 +31,9 @@ Config\Collector::$sampleRate = 50;
 Config\BizLogger::$output = "/tmp/biz-ztrace.log";
 
 $tracer = Core\GlobalTracer::tracer();
-$tracer->currentSpan()->decision->switchOver(Config\TraceEnv::LOG_ON);
-$tracer->currentSpan()->decision->switchOver(Config\TraceEnv::REPORT_ON);
-$tracer->currentSpan()->decision->switchOver(Config\TraceEnv::TRACE_ON);
+$tracer->currentSpan()->decision->turn(Config\TraceEnv::LOG_ON);
+$tracer->currentSpan()->decision->turn(Config\TraceEnv::REPORT_ON);
+$tracer->currentSpan()->decision->turn(Config\TraceEnv::TRACE_ON);
 
 // debug-log
 Config\Debug::$ON = true;

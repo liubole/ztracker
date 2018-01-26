@@ -11,8 +11,8 @@ class TraceEnv
     const SAMPLED = 0xc0;
     const NOT_SAMPLED = 0x128;
 
-    const TRACE_OFF = 0x200;
-    const TRACE_ON = 0x300;
+//    const TRACE_OFF = 0x200;
+//    const TRACE_ON = 0x300;
 
     const LOG_OFF = 0x800;
     const LOG_ON = 0xc00;

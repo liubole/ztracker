@@ -43,6 +43,7 @@ class Reporter
     }
 
     /**
+     * PS: If span is empty, return false
      * @param $spans
      * @return bool
      */
@@ -64,7 +65,7 @@ class Reporter
     private static function logLogs(&$logs)
     {
         if ($logs && Collector\BizLoggerFile::ready()) {
-            $day = self::pickDay($logs);
+            $day = self::pickOutDay($logs);
             $message = self::encode($logs, Config\Reporter::$logType);
             return Collector\BizLoggerFile::write($message, $day);
         }
@@ -119,7 +120,7 @@ class Reporter
         return null;
     }
 
-    private static function pickDay($logs)
+    private static function pickOutDay($logs)
     {
         if (isset($logs['timestamp'])) {
             $tmp = explode('.', $logs['timestamp']);

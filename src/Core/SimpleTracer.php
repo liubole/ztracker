@@ -80,7 +80,7 @@ class SimpleTracer
         $sampled = Common\Util::sampleOrNot(Config\Collector::$sampleRate)
             ? Config\TraceEnv::SAMPLED
             : Config\TraceEnv::NOT_SAMPLED;
-        $decision->switchOver($sampled);
+        $decision->turn($sampled);
         $span = GlobalTracer::spanBuilder()
             ->traceId(Common\Util::traceId())
             ->id(Common\Util::spanId())
@@ -223,48 +223,33 @@ class SimpleTracer
     }
 
     /**
-     *
+     * 1.Only when span's decision indicate 'report on' and 'sampled', spans' collection will occurs
+     * 2.Logs will be logged only when span's decision indicate 'log on'(record on)
      */
     private function collect()
     {
-        if (!$this->reportSpans) {
+        // There is nothing to collect
+        if (!$this->reportSpans && !$this->logs) {
             return;
         }
-        $reports = array();
-        foreach ($this->reportSpans as &$span) {
-            if ($span instanceof Span) {
-                if (!$span->traceId || !$span->id) continue;
-                array_push($reports, $span->convertToArray());
-            }
-        }
-        $reportOn = $this->currentSpan()->decision
-            ? $this->currentSpan()->decision->reportOn()
-            : true;
-        $logOn = $this->currentSpan()->decision
-            ? $this->currentSpan()->decision->logOn()
-            : true;
-        $logs = $spans = null;
-        if ($reportOn && $reports) {
-            $spans =& $reports;
-        }
-        if ($logOn && $this->logs) {
-            $traceId = $spanId = $timestamp = null;
-            if ($this->currentSpan()) {
-                $traceId = $this->currentSpan()->traceId;
-                $spanId = $this->currentSpan()->id;
-                $timestamp = $this->currentSpan()->timestamp;
-            }
-            $h = Common\Util::currentInHuman($timestamp);
-            $associate = $traceId
-                ? array('traceId' => $traceId, 'spanId' => $spanId, 'timestamp' => $h,)
-                : array('timestamp' => $h);
-            foreach (array_keys($associate) as $key) {
-                if (isset($this->logs[$key])) {
-                    $this->logs[$key . '_' . Common\Util::random(6)] = $this->logs[$key];
-                    unset($this->logs[$key]);
+        $spans = $logs = array();
+        // Spans
+        if ($this->reportSpans) {
+            foreach ($this->reportSpans as &$span) {
+                if ($span instanceof Span) {
+                    $reportOn = $span->decision ? $span->decision->reportOn() : true;
+                    $sampled = $span->decision ? $span->decision->sampled() : false;
+                    if (!$reportOn || !$sampled || !$span->traceId || !$span->id) continue;
+                    array_push($spans, $span->convertToArray());
                 }
             }
-            $logs = array_merge($associate, $this->logs);
+        }
+        // Logs
+        $logOn = ($this->currentSpan() && $this->currentSpan()->decision)
+            ? $this->currentSpan()->decision->logOn()
+            : true;
+        if ($logOn && $this->logs) {
+            $logs = $this->relatedWithSpan($this->currentSpan(), $this->logs);
         }
         Reporter::collect($spans, $logs);
     }
@@ -295,6 +280,32 @@ class SimpleTracer
         } else {
             $this->logs[] = $key;
         }
+    }
+
+    /**
+     * @param $span
+     * @param array $logs
+     * @return array
+     */
+    private function relatedWithSpan(Span &$span, &$logs)
+    {
+        $traceId = $spanId = $timestamp = null;
+        if ($span) {
+            $traceId = $span->traceId;
+            $spanId = $span->id;
+            $timestamp = $span->timestamp;
+        }
+        $h = Common\Util::currentInHuman($timestamp);
+        $associate = $traceId
+            ? array('traceId' => $traceId, 'spanId' => $spanId, 'timestamp' => $h,)
+            : array('timestamp' => $h);
+        foreach (array_keys($associate) as $key) {
+            if (isset($logs[$key])) {
+                $logs[$key . '_' . Common\Util::random(6)] = $logs[$key];
+                unset($logs[$key]);
+            }
+        }
+        return array_merge($associate, $logs);
     }
 
     /**
