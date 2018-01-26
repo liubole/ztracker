@@ -6,7 +6,7 @@
  */
 namespace Tricolor\ZTracker\Storage\Mysql;
 
-use Tricolor\ZTracker\Common\Util;
+use Tricolor\ZTracker\Common;
 use \Workerman\MySQL\Connection;
 
 class MysqlConnection extends Connection
@@ -84,15 +84,16 @@ class MysqlConnection extends Connection
     public static function getConnection($config)
     {
         try {
-            $host = Util::checkNotNull($config['host'], 'database config.host is null!');
-            $port = Util::checkNotNull($config['port'], 'database config.port is null!');
-            $username = Util::checkNotNull($config['username'], 'database config.username is null!');
-            $password = Util::checkNotNull($config['password'], 'database config.password is null!');
-            $database = Util::checkNotNull($config['database'], 'database config.database is null!');
+            $host = Common\Util::checkNotNull($config['host'], 'database config.host is null!');
+            $port = Common\Util::checkNotNull($config['port'], 'database config.port is null!');
+            $username = Common\Util::checkNotNull($config['username'], 'database config.username is null!');
+            $password = Common\Util::checkNotNull($config['password'], 'database config.password is null!');
+            $database = Common\Util::checkNotNull($config['database'], 'database config.database is null!');
             if (!isset(self::$conns[$database])) {
                 self::$conns[$database] = new MysqlConnection($host, $port, $username, $password, $database);
             }
         } catch (\Exception $e) {
+            Common\Debugger::fatal($e->getMessage());
             throw $e;
         }
         return self::$conns[$database];
