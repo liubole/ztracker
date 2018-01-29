@@ -81,7 +81,7 @@ class MysqlApi
                 ? $this->spanTraceIdCondition($this->toTraceIdQuery($request))
                 : $this->spanTraceIdConditionSingle($traceId);
             $sql = "SELECT $spanFields FROM `zipkin_spans` WHERE $traceIdCondition";
-            Common\Debugger::notice($sql);
+            Common\Debugger::info($sql);
             $res = $this->conn->query($sql);
             $spansWithoutAnnotations = $trace_ids = array();
             foreach ($res as $row) {
