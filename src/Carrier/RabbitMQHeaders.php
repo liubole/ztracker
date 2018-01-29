@@ -12,7 +12,7 @@ use Tricolor\ZTracker\Core;
 
 class RabbitMQHeaders implements Base
 {
-    private static $prefix = 'Tr-';
+    private static $prefix = 'Z1-';
     /**
      * @var \PhpAmqpLib\Message\AMQPMessage
      */

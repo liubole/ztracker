@@ -11,7 +11,7 @@ use Tricolor\ZTracker\Common;
 
 class HttpHeaders implements Base
 {
-    private static $prefix = 'Tr-';
+    private static $prefix = 'Z1-';
     private $headers;
     private $context;
     private $span;
