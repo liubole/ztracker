@@ -28,8 +28,9 @@ class BizLoggerFile
             return false;
         }
         $file = self::getFileName($day);
-        if (file_exists($file) OR touch($file)) {
-            return $file;
+        if (!file_exists($file)) {
+            umask(0);
+            return touch($file) ? $file : false;
         }
         return false;
     }
