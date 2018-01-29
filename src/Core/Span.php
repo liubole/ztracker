@@ -419,7 +419,7 @@ class Span
         if ($this == $that) return 0;
         $x = $this->timestamp == null ? PHP_INT_MIN : $this->timestamp;
         $y = $that->timestamp == null ? PHP_INT_MIN : $that->timestamp;
-        $byTimestamp = $x < $y ? -1 : $x == $y ? 0 : 1;
+        $byTimestamp = $x < $y ? -1 : ($x == $y ? 0 : 1);
         if ($byTimestamp != 0) return $byTimestamp;
         return substr_compare($this->name, $that->name, 0);
     }
