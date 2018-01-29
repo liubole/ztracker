@@ -83,7 +83,7 @@ class Debugger
             umask(0);
             return touch($file) ? $file : false;
         }
-        return true;
+        return $file;
     }
 
     private static function getFileName()
