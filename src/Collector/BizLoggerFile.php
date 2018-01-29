@@ -32,7 +32,7 @@ class BizLoggerFile
             umask(0);
             return touch($file) ? $file : false;
         }
-        return false;
+        return true;
     }
 
     private static function getFileName($day = null)

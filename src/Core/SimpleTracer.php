@@ -63,7 +63,7 @@ class SimpleTracer
             ->traceId($span->traceId)
             ->id(Common\Util::spanId())
             ->parentId($span->id)
-            ->localEndpoint($this->localEndpoint())
+//            ->localEndpoint($this->localEndpoint())
             ->decision($span->decision);
         $this->remoteSpan($child);
         $this->joinSpan($child);
@@ -85,8 +85,8 @@ class SimpleTracer
             ->traceId(Common\Util::traceId())
             ->id(Common\Util::spanId())
             ->name(Common\Util::getServerApi())
-            ->decision($decision)
-            ->localEndpoint($this->localEndpoint());
+//            ->localEndpoint($this->localEndpoint())
+            ->decision($decision);
         $this->currentSpan($span);
         $this->joinSpan($span);
         return $span;
@@ -198,7 +198,7 @@ class SimpleTracer
         $content = $this->carrier->getContext();
         $span = $this->carrier->getSpan();
 
-        $span->localEndpoint($this->localEndpoint());
+//        $span->localEndpoint($this->localEndpoint());
         $this->currentContext($content);
         $this->currentSpan($span);
         $this->joinSpan($span);
@@ -235,8 +235,10 @@ class SimpleTracer
         $spans = $logs = array();
         // Spans
         if ($this->reportSpans) {
+            $localEndpoint = $this->localEndpoint();
             foreach ($this->reportSpans as &$span) {
                 if ($span instanceof Span) {
+                    isset($span->localEndpoint) OR ($span->localEndpoint($localEndpoint));
                     $reportOn = $span->decision ? $span->decision->reportOn() : true;
                     $sampled = $span->decision ? $span->decision->sampled() : false;
                     if (!$reportOn || !$sampled || !$span->traceId || !$span->id) continue;

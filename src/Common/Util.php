@@ -13,6 +13,12 @@ class Util
 {
     const UTF_8 = "UTF-8";
 
+    public static function ip2num($ip)
+    {
+        $n = ip2long($ip);
+        return $n === false ? $n : ($n < 0 ? sprintf('%u', $n) : $n);
+    }
+
     public static function sampleOrNot($rate)
     {
         return mt_rand(1, 100) <= (int)$rate;

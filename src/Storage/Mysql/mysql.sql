@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS zipkin_annotations (
   `a_value` BLOB COMMENT 'BinaryAnnotation.value(), which must be smaller than 64KB',
   `a_type` INT NOT NULL COMMENT 'BinaryAnnotation.type() or -1 if Annotation',
   `a_timestamp` BIGINT COMMENT 'Used to implement TTL; Annotation.timestamp or zipkin_spans.timestamp',
-  `endpoint_ipv4` INT COMMENT 'Null when Binary/Annotation.endpoint is null',
+  `endpoint_ipv4` INT UNSIGNED COMMENT 'Null when Binary/Annotation.endpoint is null',
   `endpoint_ipv6` BINARY(16) COMMENT 'Null when Binary/Annotation.endpoint is null, or no IPv6 address',
   `endpoint_port` SMALLINT COMMENT 'Null when Binary/Annotation.endpoint is null',
   `endpoint_service_name` VARCHAR(255) COMMENT 'Null when Binary/Annotation.endpoint is null'

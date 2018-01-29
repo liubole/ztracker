@@ -156,7 +156,7 @@ class Trace extends Job
                     'a_value' => $annotation->value,
                     'a_type' => Core\BinaryAnnotationType::guess($annotation),
                     'a_timestamp' => $span->timestamp,// null?
-                    'endpoint_ipv4' => $endpoint ? ip2long($endpoint->ipv4) : null,
+                    'endpoint_ipv4' => $endpoint ? Common\Util::ip2num($endpoint->ipv4) : null,
                     'endpoint_ipv6' => $endpoint ? $endpoint->ipv6 : null,
                     'endpoint_port' => $endpoint ? $endpoint->port : null,
                     'endpoint_service_name' => $endpoint ? $endpoint->serviceName : null,
@@ -175,7 +175,7 @@ class Trace extends Job
                     'a_value' => $val,
                     'a_type' => Core\BinaryAnnotationType::guess($val),
                     'a_timestamp' => $span->timestamp,// null?
-                    'endpoint_ipv4' => $endpoint ? ip2long($endpoint->ipv4) : null,
+                    'endpoint_ipv4' => $endpoint ? Common\Util::ip2num($endpoint->ipv4) : null,
                     'endpoint_ipv6' => $endpoint ? $endpoint->ipv6 : null,
                     'endpoint_port' => $endpoint ? $endpoint->port : null,
                     'endpoint_service_name' => $endpoint ? $endpoint->serviceName : null,
