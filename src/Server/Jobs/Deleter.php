@@ -70,7 +70,7 @@ class Deleter extends Job
     {
         $d = new Storage\Mysql\Dependencies();
         $where = "`day`='" . $this->day . "'";
-        return $d->delete($where, 1);
+        return $d->delete($where);
     }
 
     /**
