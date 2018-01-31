@@ -9,6 +9,7 @@ namespace Tricolor\ZTracker\Core;
 use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Carrier;
 use Tricolor\ZTracker\Config;
+use Tricolor\ZTracker\Core;
 use Tricolor\ZTracker\Exception\NullPointerException;
 
 class SimpleTracer
@@ -211,6 +212,10 @@ class SimpleTracer
      */
     public function flush()
     {
+        $span = $this->currentSpan();
+        if (($span instanceof Core\Span) && !isset($span->duration)) {
+            $span->end();
+        }
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
             $this->collect();
@@ -292,15 +297,16 @@ class SimpleTracer
      */
     private function relatedWithSpan(Span &$span, &$logs)
     {
-        $traceId = $spanId = $timestamp = null;
+        $traceId = $spanId = $parentId = $timestamp = null;
         if ($span) {
             $traceId = $span->traceId;
             $spanId = $span->id;
+            $parentId = $span->parentId;
             $timestamp = $span->timestamp;
         }
         $h = Common\Util::currentInHuman($timestamp);
         $associate = $traceId
-            ? array('traceId' => $traceId, 'spanId' => $spanId, 'timestamp' => $h,)
+            ? array('traceId' => $traceId, 'spanId' => $spanId, 'parentId' => $parentId, 'timestamp' => $h,)
             : array('timestamp' => $h);
         foreach (array_keys($associate) as $key) {
             if (isset($logs[$key])) {
