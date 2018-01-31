@@ -13,7 +13,7 @@ use Tricolor\ZTracker\Server;
  * 1.php delete.php `date -u -d '2 month ago' +%F`
  * 2.delete.php:
  *   $day = count($argv) >= 2 ? date("Y-m-d", strtotime($argv[1])) : date('Y-m-d');
- *   $deleter = new Server\Shell\Deleter();
+ *   $deleter = new Server\Shell\MysqlDeleter();
  *   $deleter->run($day);
  * Class MysqlDeleter
  * @package Tricolor\ZTracker\Server\Shell
