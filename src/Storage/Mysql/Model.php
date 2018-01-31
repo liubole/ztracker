@@ -134,6 +134,26 @@ class Model
     }
 
     /**
+     * @param $where
+     * @param $limit
+     * @return bool|mixed
+     */
+    public function delete($where, $limit = null)
+    {
+        try {
+            self::log("DELETE FROM " . self::getTable());
+            $query = self::$conn->delete(self::getTable())->where($where);
+            if (isset($limit)) {
+                $query = $query->limit($limit);
+            }
+            return $row_count = $query->query();
+        } catch (\PDOException $e) {
+            self::log($e->getMessage(), true);
+        }
+        return false;
+    }
+
+    /**
      * @return string
      */
     public static function getTable()

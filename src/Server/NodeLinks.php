@@ -16,7 +16,7 @@ class NodeLinks
     /**
      * @param $row
      */
-    public function putTrace(&$row)
+    public function push(&$row)
     {
         $trace_id = $row['trace_id'];
         $parent_id = $row['parent_id'];

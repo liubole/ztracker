@@ -62,17 +62,18 @@ class Dependencies extends Job
     }
 
     /**
-     *
+     * @param $defense
      */
-    public function run()
+    public function run($defense = true)
     {
-        $rows = $this->fetchData();
+        $this->checkup($defense);
+        $rows = $this->fetch();
         foreach ($rows as $row) {
-            $this->links->putTrace($row);
+            $this->links->push($row);
         }
         $this->log('>There are ' . $this->links->nodesCount() . ' nodes in total!');
         $this->calOutRelations();
-        $this->storeToDb();
+        $this->store();
         $this->catchSig();
     }
 
@@ -114,7 +115,7 @@ class Dependencies extends Job
     /**
      *
      */
-    private function storeToDb()
+    private function store()
     {
         foreach ($this->dependencies as $parentChild => $callCount) {
             $pair = explode('<:', $parentChild);
@@ -147,7 +148,7 @@ class Dependencies extends Job
     /**
      * @return \Generator
      */
-    private function fetchData()
+    private function fetch()
     {
         $microsLower = bcmul($this->midnight, 1000000, 0);
         $microsUpper = bcsub(bcadd($microsLower, Common\Util::daysToMicros(), 0), 1, 0);
@@ -164,6 +165,22 @@ class Dependencies extends Job
         $pdo = self::$conn->pureQuery($linksQuery);
         while($row = $pdo->fetch(\PDO::FETCH_ASSOC)) {
             yield $row;
+        }
+    }
+
+    /**
+     * @param $defense
+     * @throws
+     */
+    private function checkup($defense)
+    {
+        if (!$defense) return;
+        $time = strtotime($this->day);
+        if ($time === false || $time === -1) {
+            throw new \Exception("Wrong day: " . $this->day);
+        }
+        if (date("Y-m-d", $time) === false) {
+            throw new \Exception("Wrong day: " . $this->day);
         }
     }
 
