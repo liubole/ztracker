@@ -8,7 +8,17 @@ namespace Tricolor\ZTracker\Server\Shell;
 
 use Tricolor\ZTracker\Server;
 
-class Deleter
+/**
+ * Usage:
+ * 1.php delete.php `date -u -d '2 month ago' +%F`
+ * 2.delete.php:
+ *   $day = count($argv) >= 2 ? date("Y-m-d", strtotime($argv[1])) : date('Y-m-d');
+ *   $deleter = new Server\Shell\Deleter();
+ *   $deleter->run($day);
+ * Class MysqlDeleter
+ * @package Tricolor\ZTracker\Server\Shell
+ */
+class MysqlDeleter
 {
     public function run($day)
     {

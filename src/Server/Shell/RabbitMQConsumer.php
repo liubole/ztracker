@@ -10,6 +10,15 @@ use Tricolor\ZTracker\Collector;
 use Tricolor\ZTracker\Common;
 use Tricolor\ZTracker\Server;
 
+/**
+ * Usage:
+ * 1.php consumer.php
+ * 2.consumer.php:
+ *  $collector = new Server\Shell\RabbitMQConsumer();
+ *  $collector->run();
+ * Class RabbitMQConsumer
+ * @package Tricolor\ZTracker\Server\Shell
+ */
 class RabbitMQConsumer
 {
     private $handler;
