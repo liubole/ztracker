@@ -7,6 +7,7 @@
 namespace Tricolor\ZTracker\Collector;
 
 use Tricolor\ZTracker\Config;
+use Tricolor\ZTracker\Common;
 
 class BizLoggerFile
 {
@@ -24,13 +25,24 @@ class BizLoggerFile
         if (!$root) {
             return false;
         }
-        if (!is_dir($root) AND !mkdir($root, 766, true)) {
-            return false;
+        if (!is_dir($root)) {
+            $old = umask(0);
+            $mk = @mkdir($root, 0777, true);
+            umask($old);
+            if (!$mk) {
+                Common\Debugger::error('mkdir failed: ' . $root);
+                return false;
+            }
         }
         $file = self::getFileName($day);
         if (!file_exists($file)) {
-            umask(0);
-            return touch($file) ? $file : false;
+            $old = umask(0);
+            $th = @touch($file);
+            umask($old);
+            if (!$th) {
+                Common\Debugger::error('create file failed: ' . $file);
+                return false;
+            }
         }
         return $file;
     }

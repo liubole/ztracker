@@ -75,13 +75,20 @@ class Debugger
         if (!$root) {
             return false;
         }
-        if (!is_dir($root) AND !mkdir($root, 766, true)) {
-            return false;
+        if (!is_dir($root)) {
+            $old = umask(0);
+            $mk = @mkdir($root, 0777, true);
+            umask($old);
+            if (!$mk) {
+                return false;
+            }
         }
         $file = self::getFileName();
         if (!file_exists($file)) {
-            umask(0);
-            return touch($file) ? $file : false;
+            $old = umask(0);
+            $th = @touch($file);
+            umask($old);
+            return $th ? $file : false;
         }
         return $file;
     }
