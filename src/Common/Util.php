@@ -77,7 +77,7 @@ class Util
      */
     public static function traceId()
     {
-        return base_convert(substr(self::random(16), 0, 15), 16, 10);
+        return ltrim(base_convert(substr(self::random(16), 0, 15), 16, 10), '0');
 //        return self::random(32);
     }
 
@@ -87,7 +87,7 @@ class Util
     public static function spanId()
     {
         $time = microtime();
-        return substr($time, 20, 1) . substr($time, 2, 6) . str_pad(getmypid(), 5, '0') . mt_rand(100, 999);
+        return ltrim(substr($time, 20, 1) . substr($time, 2, 6) . str_pad(getmypid(), 5, '0') . mt_rand(100, 999));
 //        return self::random(16);
     }
 
