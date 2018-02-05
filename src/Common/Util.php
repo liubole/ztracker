@@ -87,7 +87,7 @@ class Util
     public static function spanId()
     {
         $time = microtime();
-        return ltrim(substr($time, 20, 1) . substr($time, 2, 6) . str_pad(getmypid(), 5, '0') . mt_rand(100, 999));
+        return ltrim(substr($time, 20, 1) . substr($time, 2, 6) . str_pad(getmypid(), 5, '0') . mt_rand(100, 999), '0');
 //        return self::random(16);
     }
 
