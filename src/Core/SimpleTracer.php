@@ -312,8 +312,7 @@ class SimpleTracer
             'traceId' => $traceId,
             'spanId' => $spanId,
             'parentId' => $parentId,
-            'timestamp' => $timestamp,
-            '@timestamp' => $IOS8601,
+            'timestamp' => $IOS8601,
             'readability' => $readability,
         );
         foreach (array_keys($associate) as $key) {
