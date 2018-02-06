@@ -303,11 +303,19 @@ class SimpleTracer
             $spanId = $span->id;
             $parentId = $span->parentId;
             $timestamp = $span->timestamp;
+        } else {
+            $timestamp = Common\Util::current();
         }
-        $h = Common\Util::currentInHuman($timestamp);
-        $associate = $traceId
-            ? array('traceId' => $traceId, 'spanId' => $spanId, 'parentId' => $parentId, 'timestamp' => $h,)
-            : array('timestamp' => $h);
+        $readability = Common\Util::currentInHuman($timestamp);
+        $IOS8601 = date(DATE_ISO8601, substr($timestamp, 0, 10));
+        $associate = array(
+            'traceId' => $traceId,
+            'spanId' => $spanId,
+            'parentId' => $parentId,
+            'timestamp' => $timestamp,
+            '@timestamp' => $IOS8601,
+            'readability' => $readability,
+        );
         foreach (array_keys($associate) as $key) {
             if (isset($logs[$key])) {
                 $logs[$key . '_' . Common\Util::random(6)] = $logs[$key];
