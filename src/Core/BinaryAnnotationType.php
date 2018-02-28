@@ -54,4 +54,31 @@ class BinaryAnnotationType
         }
         return -1;
     }
+
+    public static function softGuess(&$binaryAnnotation)
+    {
+        if ($binaryAnnotation instanceof BinaryAnnotation) {
+            if (isset($binaryAnnotation->type)) {
+                return $binaryAnnotation->type;
+            }
+            $val = $binaryAnnotation->value;
+        } else {
+            $val = &$binaryAnnotation;
+        }
+        $mayBeTypes = array();
+        if (is_bool($val) || in_array(strtolower($val), array('true', 'false'), true)) {
+            $mayBeTypes[] = self::BOOL;
+        }
+        if (is_int($val) || is_numeric($val)) {
+            $mayBeTypes[] = self::I32;
+        }
+        if (is_double($val) || is_numeric($val)) {
+            $mayBeTypes[] = self::DOUBLE;
+        }
+        if (is_string($val)) {
+            $mayBeTypes[] = self::STRING;
+        }
+        return $mayBeTypes ? array_unique($mayBeTypes) : array(-1);
+    }
+
 }

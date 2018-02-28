@@ -239,8 +239,9 @@ class MysqlApi
         foreach ($request->binaryAnnotations as $key => $val) {
             $aT = "a" . $i++;
             $aTable = "`zipkin_annotations` AS `$aT`";
+            $guessType = '(' . implode(',', Core\BinaryAnnotationType::softGuess($val)) . ')';
             $table = $table . " JOIN $aTable ON " . $this->joinCondition($aT) .
-                " AND `$aT`.`a_type`=" . Core\BinaryAnnotationType::STRING .
+                " AND `$aT`.`a_type` in " . $guessType .
                 " AND `$aT`.`a_key`='$key'" .
                 " AND `$aT`.`a_value`='$val'";
             $table = $this->maybeOnService($table, $aT, $request->serviceName);
