@@ -67,7 +67,7 @@ class QueryRequestBuilder
     public function parseAnnotationQuery($annotationQuery)
     {
         if ($annotationQuery != null && !empty($annotationQuery)) {
-            foreach (explode(" and ", $annotationQuery) as $ann) {
+            foreach (explode(" and ", urldecode($annotationQuery)) as $ann) {
                 $idx = strpos($ann, '=');
                 if ($idx === false) {
                     $this->addAnnotation($ann);
