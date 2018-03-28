@@ -70,7 +70,7 @@ Server(index.php):
     }
     ```
 
-If we want to use it at other place:  
+If we want to use it somewhere else, for example recording span of mysql server:  
 
     ```
     global $trace_open;
