@@ -149,6 +149,10 @@ class Trace extends Job
             foreach ($span->binaryAnnotations as $annotation) {
                 $entity = new Storage\Mysql\Annotations();
                 $endpoint = $annotation->endpoint ? $annotation->endpoint : $span->localEndpoint;
+                // timestamp may be wrong
+                if ($span->timestamp < 0 || $span->timestamp > 9223372036854770000) {
+                    Common\Debugger::error("timestamp is wrong:" . var_export($span->timestamp, 1));
+                }
                 $entity->enrich(array(
                     'trace_id' => $span->traceId,
                     'span_id' => $span->id,
