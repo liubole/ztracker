@@ -2,7 +2,7 @@
 
 ## Configuration  
     
-    Add the following to your composer.json:  
+Add the following to your composer.json:  
     
     ```
     "require": {
@@ -16,7 +16,7 @@
     ],
     ```
     
-    Add the following to your "index.php"(or the entrance of request, both client and server):  
+Add the following to your "index.php"(or the entrance of request, both client and server):  
     
     ```
     global $trace_open;
@@ -33,7 +33,7 @@
     
 ## Usage  
 
-    Client(index.php):  
+Client(index.php):  
     
     ```
     global $trace_open;
@@ -51,7 +51,7 @@
     }
     ```
     
-    Server(index.php):  
+Server(index.php):  
 
     ```
     global $trace_open;
@@ -70,7 +70,7 @@
     }
     ```
 
-    If we want to use it at other place:  
+If we want to use it at other place:  
 
     ```
     global $trace_open;
