@@ -1,6 +1,9 @@
-"# ztracker" 
-##Configuration
-    Add the following to your composer.json:
+# ztracker  
+
+## Configuration  
+    
+    Add the following to your composer.json:  
+    
     ```
     "require": {
         "tricolor/ztracker": "~0.0.7.6"
@@ -12,7 +15,9 @@
         }
     ],
     ```
-    Add the following to your "index.php"(or the entrance of request, both client and server):
+    
+    Add the following to your "index.php"(or the entrance of request, both client and server):  
+    
     ```
     global $trace_open;
     $trace_open = class_exists('Tricolor\ZTracker\Core\GlobalTracer');
@@ -25,8 +30,11 @@
         \Tricolor\ZTracker\Config\BizLogger::$output = '/tmp/trace_logs/biz-ztrace.log';
     }
     ```
-##Usage
-    Client(index.php):
+    
+## Usage  
+
+    Client(index.php):  
+    
     ```
     global $trace_open;
     if ($trace_open) {
@@ -42,7 +50,9 @@
         } catch (\Exception $e) {}
     }
     ```
-    Server(index.php):
+    
+    Server(index.php):  
+
     ```
     global $trace_open;
     if ($trace_open) {
@@ -59,7 +69,9 @@
         } catch (\Exception $e) {}
     }
     ```
-    If we want to use it at other place:
+
+    If we want to use it at other place:  
+
     ```
     global $trace_open;
     if ($trace_open) {
@@ -68,11 +80,13 @@
             ->shared(false)->kind(\Tricolor\ZTracker\Core\SpanKind\Client);
     }
     ```
-##Further reading   
-1. Google Dapper: https://research.google.com/archive/papers/dapper-2010-1.pdf
+
+## Further reading  
+
+1. Google Dapper: https://research.google.com/archive/papers/dapper-2010-1.pdf  
 2. Zipkin: https://zipkin.io/  
-GitHub - openzipkin/zipkin: https://github.com/openzipkin/zipkin
-4. OpenTracing: http://opentracing.io/  
-OpenTracing API · GitHub: https://github.com/opentracing
+GitHub - openzipkin/zipkin: https://github.com/openzipkin/zipkin  
+4. OpenTracing: http://opentracing.io/   
+OpenTracing API · GitHub: https://github.com/opentracing  
     
     
