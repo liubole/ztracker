@@ -1,6 +1,6 @@
 {
   "name": "tricolor/ztracker",
-  "description": "php写的调用链跟踪系统，输出格式是Zipkin的格式。",
+  "description": "php写的调用链跟踪系统，输出格式是Zipkin的格式。包含了数据收集、数据合并、数据存储、数据展示等各个部分，是调用链跟踪的核心。",
   "keywords": [
     "track",
     "debug",
