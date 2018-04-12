@@ -1,12 +1,13 @@
 {
   "name": "tricolor/ztracker",
-  "description": "openzipkin in php(client)",
+  "description": "php写的调用链跟踪系统，输出格式是Zipkin的格式。",
   "keywords": [
     "track",
     "debug",
     "openzipkin"
   ],
   "time": "2017-12-10",
+  "homepage": "https://gitlab.oneitfarm.com/packagist/ztracker",
   "license": "MIT License",
   "authors": [
     {
