@@ -81,6 +81,44 @@ If we want to use it somewhere else, for example recording span of mysql server:
     }
     ```
 
+Publisher(RabbitMQ):  
+
+    ```
+    global $trace_open;
+    if ($trace_open && class_exists('\Tricolor\ZTracker\Core\GlobalTracer')) {
+        try {
+            $tracer = \Tricolor\ZTracker\Core\GlobalTracer::tracer();
+            $tracer->newChildSpan()
+                ->name($routing_key)
+                ->shared(true)
+                ->kind(\Tricolor\ZTracker\Core\SpanKind\Producer);
+            $tracer->injector(\Tricolor\ZTracker\Carrier\CarrierType\RabbitMQHeader)
+                ->inject($msg);
+        } catch (\Exception $e) {
+        }
+    }
+    ```
+    
+Consumer(RabbitMQ):  
+
+    ```
+    global $trace_open;
+    $trace_open = class_exists('Tricolor\ZTracker\Core\GlobalTracer') && $file_path;
+    if ($trace_open) {
+        try {
+            \Tricolor\ZTracker\Config\Collector::rabbitConfig($trace_rabbitmq);
+            \Tricolor\ZTracker\Config\BizLogger::$output = '/tmp/trace_logs/biz-ztrace.log';
+            $tracer = \Tricolor\ZTracker\Core\GlobalTracer::tracer();
+            $tracer->injector(\Tricolor\ZTracker\Carrier\CarrierType\RabbitMQHeader)->extract($msg);
+            $tracer->currentSpan()
+                ->name($routing_key)
+                ->shared(true)
+                ->kind(\Tricolor\ZTracker\Core\SpanKind\Consumer);
+        } catch (\Exception $e) {
+        }
+    }
+    ```
+    
 ## Further reading  
 
 1. Google Dapper: https://research.google.com/archive/papers/dapper-2010-1.pdf  
